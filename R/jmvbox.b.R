@@ -85,6 +85,17 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         formatLegend(self$options)
                 }
 
+                if (self$options$boxMean) {
+                    p <- p +
+                        ggplot2::stat_summary(
+                            fun = mean,
+                            geom = "point",
+                            shape = 15,
+                            size = 3,
+                            color = theme$color[1]
+                        )
+                }
+
                 if (self$options$xAxisLabelFontSizeRevLabels) {
                     p <- p + ggplot2::scale_x_discrete(limits = rev)
                 }

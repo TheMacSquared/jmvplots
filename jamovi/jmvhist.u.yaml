@@ -91,6 +91,12 @@ children:
                         format: number
                         enable: (density)
               - type: Label
+                label: Grupowanie
+                children:
+                  - type: CheckBox
+                    name: histFacet
+                    enable: (group)
+              - type: Label
                 label: Plot Orientation
                 children:
                   - type: CheckBox

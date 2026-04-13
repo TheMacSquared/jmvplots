@@ -116,6 +116,15 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     }
 
                     p <- p + ggtheme + formatLegend(self$options)
+
+                    if (self$options$histFacet) {
+                        p <- p +
+                            ggplot2::facet_wrap(
+                                ~ group,
+                                ncol = 1,
+                                scales = "free_y"
+                            )
+                    }
                 }
 
                 ylims <- NULL

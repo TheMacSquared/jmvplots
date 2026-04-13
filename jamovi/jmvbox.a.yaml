@@ -63,7 +63,13 @@ options:
       type: Bool
       default: true
 
-
+    - name: boxMean
+      title: Średnia
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), add mean as a square point to the box plot
 
     - name: title
       title: Title text

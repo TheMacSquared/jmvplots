@@ -87,7 +87,14 @@ options:
       type: Number
       default: 0.5
 
-
+    - name: histFacet
+      title: Rozdzielone wykresy (facet)
+      type: Bool
+      default: false
+      description:
+          R: >
+            `TRUE` or `FALSE` (default), display groups as separate faceted plots
+            instead of overlaid histograms
 
     - name: title
       title: Title text

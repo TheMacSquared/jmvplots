@@ -54,6 +54,8 @@ children:
                     name: outliers
                   - type: CheckBox
                     name: notch
+                  - type: CheckBox
+                    name: boxMean
           - type: LayoutBox
             cell:
               column: 1
