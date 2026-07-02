@@ -1,7 +1,7 @@
 ---
 title: Plots bundled with jamovi
 name: scatr
-version: 2.8.0
+version: 2.8.1
 jms: '1.0'
 authors:
   - Ravi Selker
@@ -61,34 +61,6 @@ analyses:
     menuGroup: More
     menuTitle: Hexbin Plot
     category: plots
-  - title: Scatter Plot
-    name: scat
-    ns: scatr
-    menuGroup: Exploration
-    menuTitle: Scatter Plot
-    menuSubgroup: scatr
-    category: analyses
-  - title: Pareto Plot
-    name: pareto
-    ns: scatr
-    menuGroup: Exploration
-    menuTitle: Pareto Plot
-    menuSubgroup: scatr
-    category: analyses
-  - title: Ridgeline Plot
-    name: ridge
-    ns: scatr
-    menuGroup: Exploration
-    menuTitle: Ridgeline Plot
-    menuSubgroup: scatr
-    category: analyses
-  - title: Hexbin Plot
-    name: hexbin
-    ns: scatr
-    menuGroup: Exploration
-    menuTitle: Hexbin Plot
-    menuSubgroup: scatr
-    category: analyses
 usesNative: true
 minApp: 1.0.8
 index: 1
