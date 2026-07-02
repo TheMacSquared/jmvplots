@@ -1,0 +1,267 @@
+---
+name:  ridge
+title: Ridgeline Plot
+category: plots
+menuGroup: More
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: var
+      title: Variable
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: group
+      title: Grouping Variable
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: scale
+      title: Overlap
+      type: Number
+      default: 1.5
+      min: 0
+
+    - name: gradient
+      title: Colour by value
+      type: Bool
+      default: false
+
+    - name: naOmit
+      title: Exclude cases listwise
+      type: Bool
+      default: false
+
+
+
+    - name: title
+      title: Title text
+      type: String
+      default: ''
+
+    - name: titleAlign
+      title: Align
+      type: List
+      options:
+        - name: left
+          title: Left
+        - name: center
+          title: Center
+        - name: right
+          title: Right
+      default: center
+
+    - name: titleFontSize
+      title: Font size
+      type: Number
+      default: 16
+
+    - name: titleFontFace
+      title: Font face
+      type: List
+      options:
+        - name: plain
+          title: Plain
+        - name: bold
+          title: Bold
+        - name: italic
+          title: Italic
+        - name: bold-italic
+          title: Bold Italic
+      default: plain
+
+    - name: subtitle
+      title: Title text
+      type: String
+      default: ''
+
+    - name: subtitleAlign
+      title: Align
+      type: List
+      options:
+        - name: left
+          title: Left
+        - name: center
+          title: Center
+        - name: right
+          title: Right
+      default: left
+
+    - name: subtitleFontSize
+      title: Font size
+      type: Number
+      default: 16
+
+    - name: subtitleFontFace
+      title: Font face
+      type: List
+      options:
+        - name: plain
+          title: Plain
+        - name: bold
+          title: Bold
+        - name: italic
+          title: Italic
+        - name: bold-italic
+          title: Bold Italic
+      default: plain
+
+    - name: caption
+      title: Title text
+      type: String
+      default: ''
+
+    - name: captionAlign
+      title: Align
+      type: List
+      options:
+        - name: left
+          title: Left
+        - name: center
+          title: Center
+        - name: right
+          title: Right
+      default: right
+
+    - name: captionFontSize
+      title: Font size
+      type: Number
+      default: 12
+
+    - name: captionFontFace
+      title: Font face
+      type: List
+      options:
+        - name: plain
+          title: Plain
+        - name: bold
+          title: Bold
+        - name: italic
+          title: Italic
+        - name: bold-italic
+          title: Bold Italic
+      default: plain
+
+    - name: xLabel
+      title: Title text
+      type: String
+      default: ''
+
+    - name: xLabelAlign
+      title: Align
+      type: List
+      options:
+        - name: left
+          title: Left
+        - name: center
+          title: Center
+        - name: right
+          title: Right
+      default: center
+
+    - name: xLabelFontSize
+      title: Font size
+      type: Number
+      default: 16
+
+    - name: xLabelFontFace
+      title: Font face
+      type: List
+      options:
+        - name: plain
+          title: Plain
+        - name: bold
+          title: Bold
+        - name: italic
+          title: Italic
+        - name: bold-italic
+          title: Bold Italic
+      default: plain
+
+    - name: yLabel
+      title: Title text
+      type: String
+      default: ''
+
+    - name: yLabelAlign
+      title: Align
+      type: List
+      options:
+        - name: left
+          title: Left
+        - name: center
+          title: Center
+        - name: right
+          title: Right
+      default: center
+
+    - name: yLabelFontSize
+      title: Font size
+      type: Number
+      default: 16
+
+    - name: yLabelFontFace
+      title: Font face
+      type: List
+      options:
+        - name: plain
+          title: Plain
+        - name: bold
+          title: Bold
+        - name: italic
+          title: Italic
+        - name: bold-italic
+          title: Bold Italic
+      default: plain
+
+    - name: titleType
+      title: ""
+      type: List
+      options:
+        - name: title
+          title: Plot Title
+        - name: subtitle
+          title: Plot Subtitle
+        - name: caption
+          title: Plot Caption
+        - name: xTitle
+          title: X-Axis Title
+        - name: yTitle
+          title: Y-Axis Title
+      default: title
+
+    - name: yAxisLabelFontSize
+      title: Label font size
+      type: Number
+      default: 12
+
+    - name: yAxisLabelRotation
+      title: Label rotation
+      type: Number
+      default: 0
+      min: 0
+      max: 360
+
+    - name: xAxisLabelFontSize
+      title: Label font size
+      type: Number
+      default: 12
+
+    - name: xAxisLabelRotation
+      title: Label rotation
+      type: Number
+      default: 0
+      min: 0
+      max: 360
+...

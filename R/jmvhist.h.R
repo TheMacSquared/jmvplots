@@ -18,6 +18,7 @@ jmvhistOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             density = FALSE,
             densityOpacity = 0.2,
             densityLineSize = 0.5,
+            histFacet = FALSE,
             title = "",
             titleAlign = "center",
             titleFontSize = 16,
@@ -132,6 +133,10 @@ jmvhistOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "densityLineSize",
                 densityLineSize,
                 default=0.5)
+            private$..histFacet <- jmvcore::OptionBool$new(
+                "histFacet",
+                histFacet,
+                default=FALSE)
             private$..title <- jmvcore::OptionString$new(
                 "title",
                 title,
@@ -416,6 +421,7 @@ jmvhistOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..density)
             self$.addOption(private$..densityOpacity)
             self$.addOption(private$..densityLineSize)
+            self$.addOption(private$..histFacet)
             self$.addOption(private$..title)
             self$.addOption(private$..titleAlign)
             self$.addOption(private$..titleFontSize)
@@ -474,6 +480,7 @@ jmvhistOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         density = function() private$..density$value,
         densityOpacity = function() private$..densityOpacity$value,
         densityLineSize = function() private$..densityLineSize$value,
+        histFacet = function() private$..histFacet$value,
         title = function() private$..title$value,
         titleAlign = function() private$..titleAlign$value,
         titleFontSize = function() private$..titleFontSize$value,
@@ -531,6 +538,7 @@ jmvhistOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..density = NA,
         ..densityOpacity = NA,
         ..densityLineSize = NA,
+        ..histFacet = NA,
         ..title = NA,
         ..titleAlign = NA,
         ..titleFontSize = NA,
@@ -634,6 +642,8 @@ jmvhistBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param density .
 #' @param densityOpacity .
 #' @param densityLineSize .
+#' @param histFacet \code{TRUE} or \code{FALSE} (default), display groups as
+#'   separate faceted plots instead of overlaid histograms
 #' @param title .
 #' @param titleAlign .
 #' @param titleFontSize .
@@ -698,6 +708,7 @@ jmvhist <- function(
     density = FALSE,
     densityOpacity = 0.2,
     densityLineSize = 0.5,
+    histFacet = FALSE,
     title = "",
     titleAlign = "center",
     titleFontSize = 16,
@@ -769,6 +780,7 @@ jmvhist <- function(
         density = density,
         densityOpacity = densityOpacity,
         densityLineSize = densityLineSize,
+        histFacet = histFacet,
         title = title,
         titleAlign = titleAlign,
         titleFontSize = titleFontSize,

@@ -49,6 +49,18 @@ analyses:
     menuGroup: More
     menuTitle: Pareto Plot
     category: plots
+  - title: Ridgeline Plot
+    name: ridge
+    ns: scatr
+    menuGroup: More
+    menuTitle: Ridgeline Plot
+    category: plots
+  - title: Hexbin Plot
+    name: hexbin
+    ns: scatr
+    menuGroup: More
+    menuTitle: Hexbin Plot
+    category: plots
   - title: Scatter Plot
     name: scat
     ns: scatr
@@ -61,6 +73,20 @@ analyses:
     ns: scatr
     menuGroup: Exploration
     menuTitle: Pareto Plot
+    menuSubgroup: scatr
+    category: analyses
+  - title: Ridgeline Plot
+    name: ridge
+    ns: scatr
+    menuGroup: Exploration
+    menuTitle: Ridgeline Plot
+    menuSubgroup: scatr
+    category: analyses
+  - title: Hexbin Plot
+    name: hexbin
+    ns: scatr
+    menuGroup: Exploration
+    menuTitle: Hexbin Plot
     menuSubgroup: scatr
     category: analyses
 usesNative: true

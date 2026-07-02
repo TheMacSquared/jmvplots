@@ -1,0 +1,14 @@
+---
+name:  ridge
+title: Ridgeline Plot
+jrs:   '1.1'
+
+items:
+    - name: plot
+      title: ''
+      type: Image
+      description: an image containing the ridgeline plot
+      width: 550
+      height: 500
+      renderFun: .ridgePlot
+...
