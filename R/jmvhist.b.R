@@ -45,8 +45,16 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     binWidth <- private$.calculateBinWidth(image$state$y)
                 }
 
+                state <- image$state
+                if (!is.null(group) && is.factor(state$group)) {
+                    # wrap long legend labels (colours still come from ggtheme)
+                    wrapped <- jmvcore::wrapLabels(levels(state$group))
+                    if (!anyDuplicated(wrapped))
+                        levels(state$group) <- wrapped
+                }
+
                 if (is.null(group)) {
-                    p <- ggplot(image$state, aes(x = y))
+                    p <- ggplot(state, aes(x = y))
 
                     if (self$options$bins) {
                         p <- p +
@@ -82,7 +90,7 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     p <- p + ggtheme
                 } else {
                     p <- ggplot(
-                        image$state,
+                        state,
                         aes(x = y, fill = group, color = group)
                     )
 
@@ -123,6 +131,7 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                                 ~ group,
                                 ncol = 1,
                                 scales = "free_y"
+                                # facet strips use the group levels wrapped above
                             )
                     }
                 }

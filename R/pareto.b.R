@@ -78,6 +78,7 @@ paretoClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             name = .("Cumulative Percentage")
                         )
                     ) +
+                    ggplot2::scale_x_discrete(labels = jmvcore::wrapLabels) +
                     ggtheme
 
                 labelDefaults <- list(xLabel = labels$x, yLabel = labels$y)

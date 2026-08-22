@@ -223,6 +223,13 @@ jmvbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     }
                 }
 
+                # wrap long legend labels (colours still come from ggtheme)
+                if ("group" %in% colnames(data) && is.factor(data$group)) {
+                    wrapped <- jmvcore::wrapLabels(levels(data$group))
+                    if (!anyDuplicated(wrapped))
+                        levels(data$group) <- wrapped
+                }
+
                 plot_call_list <- list(
                     "ggplot" = private$.getInitPlotCallList(data),
                     "geom_bar" = private$.getGeomBarCallList(theme)
@@ -241,10 +248,10 @@ jmvbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         self$options$mode == "counts" &&
                         !is.null(self$options$countsLabels)
                 ) {
-                    scale_args <- list(labels = data$label_text)
+                    scale_args <- list(labels = jmvcore::wrapLabels(data$label_text))
                     if (self$options$xAxisLabelFontSizeRevLabels) {
                         scale_args$limits <- rev
-                        scale_args$labels <- rev(data$label_text)
+                        scale_args$labels <- rev(scale_args$labels)
                     }
                     plot_call_list$scale_x_discrete <- list(
                         ggplot2::scale_x_discrete,
@@ -253,7 +260,12 @@ jmvbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 } else if (self$options$xAxisLabelFontSizeRevLabels) {
                     plot_call_list$scale_x_discrete <- list(
                         ggplot2::scale_x_discrete,
-                        list(limits = rev)
+                        list(limits = rev, labels = jmvcore::wrapLabels)
+                    )
+                } else {
+                    plot_call_list$scale_x_discrete <- list(
+                        ggplot2::scale_x_discrete,
+                        list(labels = jmvcore::wrapLabels)
                     )
                 }
 

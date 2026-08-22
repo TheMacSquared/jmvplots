@@ -50,8 +50,16 @@ scatClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 group <- self$options$group
                 line <- self$options$regLine
 
+                state <- image$state
+                if (!is.null(group) && is.factor(state$group)) {
+                    # wrap long legend labels (colours still come from ggtheme)
+                    wrapped <- jmvcore::wrapLabels(levels(state$group))
+                    if (!anyDuplicated(wrapped))
+                        levels(state$group) <- wrapped
+                }
+
                 if (is.null(group)) {
-                    p <- ggplot(image$state, aes(x = x, y = y)) +
+                    p <- ggplot(state, aes(x = x, y = y)) +
                         ggplot2::geom_point(
                             size = self$options$pointSize,
                             color = theme$color[1],
@@ -70,7 +78,7 @@ scatClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             )
                     }
                 } else {
-                    p <- ggplot(image$state, aes(x = x, y = y, color = group, fill = group)) +
+                    p <- ggplot(state, aes(x = x, y = y, color = group, fill = group)) +
                         ggplot2::geom_point(
                             size = self$options$pointSize,
                         ) +

@@ -60,6 +60,8 @@ ridgeClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         ggtheme
                 }
 
+                p <- p + ggplot2::scale_y_discrete(labels = jmvcore::wrapLabels)
+
                 labelDefaults <- list(
                     xLabel = self$options$var,
                     yLabel = self$options$group

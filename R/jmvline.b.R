@@ -119,6 +119,13 @@ jmvlineClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     }
                 }
 
+                # wrap long legend labels (colours still come from ggtheme)
+                if ("group" %in% colnames(data) && is.factor(data$group)) {
+                    wrapped <- jmvcore::wrapLabels(levels(data$group))
+                    if (!anyDuplicated(wrapped))
+                        levels(data$group) <- wrapped
+                }
+
                 if (is.null(self$options$group)) {
                     p <- ggplot(data, aes(x = x, y = y, group = 1))
 
@@ -185,6 +192,11 @@ jmvlineClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                                 show.legend = FALSE
                             )
                     }
+                }
+
+                # categorical x axis: wrap long labels (continuous x untouched)
+                if (is.factor(data$x) || is.character(data$x)) {
+                    p <- p + ggplot2::scale_x_discrete(labels = jmvcore::wrapLabels)
                 }
 
                 ylims <- NULL

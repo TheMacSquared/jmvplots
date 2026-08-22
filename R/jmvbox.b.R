@@ -58,6 +58,13 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     }
                 }
 
+                # wrap long legend labels (colours still come from ggtheme)
+                if ("group" %in% colnames(data) && is.factor(data$group)) {
+                    wrapped <- jmvcore::wrapLabels(levels(data$group))
+                    if (!anyDuplicated(wrapped))
+                        levels(data$group) <- wrapped
+                }
+
                 if (is.null(self$options$group1) && is.null(self$options$group2)) {
                     p <- ggplot(data, aes(x = x, y = y)) +
                         ggplot2::geom_boxplot(
@@ -109,7 +116,9 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 }
 
                 if (self$options$xAxisLabelFontSizeRevLabels) {
-                    p <- p + ggplot2::scale_x_discrete(limits = rev)
+                    p <- p + ggplot2::scale_x_discrete(limits = rev, labels = jmvcore::wrapLabels)
+                } else {
+                    p <- p + ggplot2::scale_x_discrete(labels = jmvcore::wrapLabels)
                 }
 
                 labelDefaults <- private$.getDefaultLabels()
