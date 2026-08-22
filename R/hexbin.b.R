@@ -34,7 +34,7 @@ hexbinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 p <- ggplot(image$state, aes(x = x, y = y)) +
                     ggplot2::geom_hex(bins = self$options$bins) +
                     ggtheme +
-                    ggplot2::scale_fill_viridis_c() +
+                    paletteFillGradient(theme) +
                     formatLegend(self$options)
 
                 ylims <- NULL

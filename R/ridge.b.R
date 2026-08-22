@@ -49,7 +49,7 @@ ridgeClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             color = theme$color[1]
                         ) +
                         ggtheme +
-                        ggplot2::scale_fill_viridis_c()
+                        paletteFillGradient(theme)
                 } else {
                     p <- ggplot(data, aes(x = x, y = y)) +
                         ggridges::geom_density_ridges(

@@ -406,3 +406,20 @@ autoscalePlotBreaks <- function(p, width_px, height_px) {
 
     return(p)
 }
+
+#' Build a continuous fill scale from the user-selected palette
+#'
+#' Replaces hard-coded continuous scales (e.g. viridis) so that gradients
+#' follow the palette chosen in the plot theme. The ramp runs from the
+#' neutral fill background (`theme$fill[1]`) through a few palette colours,
+#' so sequential palettes (Greys/Blues/Greens) remain monotone and
+#' qualitative palettes still read as "light -> palette".
+#'
+#' @param theme plot theme list with `fill` and `palette` elements
+#' @param n number of palette colours to include in the ramp
+#' @return a ggplot2 `scale_fill_gradientn` layer
+paletteFillGradient <- function(theme, n = 3) {
+    cols <- jmvcore::colorPalette(n, theme$palette, 'fill')
+    ramp <- grDevices::colorRampPalette(c(theme$fill[1], cols))(32)
+    ggplot2::scale_fill_gradientn(colours = ramp)
+}

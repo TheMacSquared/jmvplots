@@ -58,7 +58,7 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     }
                 }
 
-                if (is.null(self$options$group1) || is.null(self$options$group2)) {
+                if (is.null(self$options$group1) && is.null(self$options$group2)) {
                     p <- ggplot(data, aes(x = x, y = y)) +
                         ggplot2::geom_boxplot(
                             notch = self$options$notch,
@@ -68,6 +68,18 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             fill = theme$fill[2]
                         ) +
                         ggtheme
+                } else if (is.null(self$options$group1) || is.null(self$options$group2)) {
+                    # single grouping variable: one palette colour per box,
+                    # no legend (the groups are already labelled on the axis)
+                    p <- ggplot(data, aes(x = x, y = y, fill = x)) +
+                        ggplot2::geom_boxplot(
+                            notch = self$options$notch,
+                            width = self$options$boxWidth,
+                            outliers = self$options$outliers,
+                            color = theme$color[1]
+                        ) +
+                        ggtheme +
+                        ggplot2::guides(fill = "none")
                 } else {
                     p <- ggplot(data, aes(x = x, y = y, fill = group)) +
                         ggplot2::geom_boxplot(
