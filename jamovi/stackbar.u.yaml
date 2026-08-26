@@ -1,5 +1,5 @@
-title: Ridgeline Plot
-name: ridge
+title: Stacked Bar Plot
+name: stackbar
 jus: '3.0'
 stage: 0
 compilerMode: tame
@@ -9,17 +9,24 @@ children:
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Variable
+        label: X Variable
         children:
           - type: VariablesListBox
-            name: var
+            name: x
             maxItemCount: 1
             isTarget: true
       - type: TargetLayoutBox
-        label: Grouping Variable
+        label: Segments Variable
         children:
           - type: VariablesListBox
-            name: group
+            name: segments
+            maxItemCount: 1
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Counts (optional)
+        children:
+          - type: VariablesListBox
+            name: counts
             maxItemCount: 1
             isTarget: true
   - type: CollapseBox
@@ -38,13 +45,29 @@ children:
             stretchFactor: 1
             children:
               - type: Label
-                label: Ridges
+                label: Bar heights
+                children:
+                  - type: RadioButton
+                    name: barType_percent
+                    optionName: barType
+                    optionPart: percent
+                  - type: RadioButton
+                    name: barType_count
+                    optionName: barType
+                    optionPart: count
+              - type: Label
+                label: Bar
                 children:
                   - type: TextBox
-                    name: scale
+                    name: barWidth
                     format: number
                   - type: CheckBox
-                    name: gradient
+                    name: percentLabels
+                    enable: (barType:percent)
+                    children:
+                      - type: ComboBox
+                        name: percentLabelsPosition
+                        enable: (percentLabels)
           - type: LayoutBox
             cell:
               column: 1
@@ -52,10 +75,10 @@ children:
             stretchFactor: 1
             children:
               - type: Label
-                label: Missing Values
+                label: Plot Orientation
                 children:
                   - type: CheckBox
-                    name: naOmit
+                    name: flipAxes
   - type: CollapseBox
     label: Plot & Axis Titles
     collapsed: true
@@ -160,6 +183,26 @@ children:
                     name: xAxisLabelRotation
                     suffix: "°"
                     format: number
+              - type: Label
+                label: Range
+                children:
+                  - type: RadioButton
+                    name: xAxisRangeType_auto
+                    optionName: xAxisRangeType
+                    optionPart: auto
+                  - type: RadioButton
+                    name: xAxisRangeType_manual
+                    optionName: xAxisRangeType
+                    optionPart: manual
+                    children:
+                      - type: TextBox
+                        name: xAxisRangeMin
+                        format: number
+                        enable: (xAxisRangeType:manual)
+                      - type: TextBox
+                        name: xAxisRangeMax
+                        format: number
+                        enable: (xAxisRangeType:manual)
           - type: LayoutBox
             cell:
               column: 1
@@ -176,7 +219,26 @@ children:
                     name: yAxisLabelRotation
                     suffix: "°"
                     format: number
-
+              - type: Label
+                label: Range
+                children:
+                  - type: RadioButton
+                    name: yAxisRangeType_auto
+                    optionName: yAxisRangeType
+                    optionPart: auto
+                  - type: RadioButton
+                    name: yAxisRangeType_manual
+                    optionName: yAxisRangeType
+                    optionPart: manual
+                    children:
+                      - type: TextBox
+                        name: yAxisRangeMin
+                        format: number
+                        enable: (yAxisRangeType:manual)
+                      - type: TextBox
+                        name: yAxisRangeMax
+                        format: number
+                        enable: (yAxisRangeType:manual)
   - type: CollapseBox
     label: Legend
     collapsed: true

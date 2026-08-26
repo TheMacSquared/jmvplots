@@ -1,0 +1,15 @@
+---
+name:  corrgram
+title: Correlogram
+jrs:   '1.1'
+
+items:
+    - name: plot
+      title: ''
+      type: Image
+      description: an image containing the correlogram
+      width: 500
+      height: 500
+      renderFun: .corrgramPlot
+
+...

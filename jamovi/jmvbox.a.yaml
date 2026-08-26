@@ -2,7 +2,7 @@
 name:  jmvbox
 title: Box Plot
 category: plots
-menuGroup: .
+menuGroup: Comparison
 version: '1.0.0'
 jas: '1.2'
 

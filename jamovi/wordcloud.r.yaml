@@ -1,0 +1,14 @@
+---
+name:  wordcloud
+title: Word Cloud
+jrs:   '1.1'
+
+items:
+    - name: plot
+      title: ''
+      type: Image
+      description: an image containing the word cloud
+      width: 500
+      height: 500
+      renderFun: .wordcloudPlot
+...

@@ -1,49 +1,68 @@
 ---
-name:  pareto
-title: Pareto Plot
+name:  lollipop
+title: Lollipop Plot
 category: plots
-menuGroup: Other
+menuGroup: Ranking
 version: '1.0.0'
 jas: '1.2'
 
 options:
     - name: data
       type: Data
-      description:
-          R: the data as a data frame
 
     - name: x
-      title: X-Axis
+      title: Variable
       type: Variable
       suggested:
         - nominal
       permitted:
         - factor
-      description:
-          R: >
-            a string naming the variable from `data` that contains the
-            values used for the chart
-
-    - name: counts
-      title: 'Counts (optional)'
-      type: Variable
       default: null
+
+    - name: y
+      title: Value Variable (optional)
+      type: Variable
       suggested:
         - continuous
       permitted:
         - numeric
-      description:
-          R: >
-            a string naming the variable from `data` that contains the
-            counts for the values (optional)
+      default: null
 
-    - name: barWidth
-      title: Width
+    - name: aggregation
+      title: Summary
+      type: List
+      options:
+        - name: mean
+          title: Mean
+        - name: sum
+          title: Sum
+        - name: median
+          title: Median
+      default: mean
+
+    - name: sortBars
+      title: Sort by value
+      type: Bool
+      default: true
+
+    - name: lineWidth
+      title: Line width
       type: Number
-      default: 0.6
-      min: 0
+      default: 0.7
+      min: 0.1
+      max: 3
 
+    - name: pointSize
+      title: Point size
+      type: Number
+      default: 3
+      min: 0.5
+      max: 10
 
+    - name: flipAxes
+      title: Flip axes
+      type: Bool
+      default: false
 
     - name: title
       title: Title text
@@ -246,6 +265,26 @@ options:
       type: Number
       default: 12
 
+    - name: yAxisRangeType
+      title: Y-Axis Range
+      type: List
+      options:
+        - name: auto
+          title: Auto
+        - name: manual
+          title: Manual
+      default: auto
+
+    - name: yAxisRangeMin
+      title: Min
+      type: Number
+      default: 0
+
+    - name: yAxisRangeMax
+      title: Max
+      type: Number
+      default: 10
+
     - name: yAxisLabelRotation
       title: Label rotation
       type: Number
@@ -257,6 +296,11 @@ options:
       title: Label font size
       type: Number
       default: 12
+
+    - name: xAxisLabelFontSizeRevLabels
+      title: Reverse labels
+      type: Bool
+      default: false
 
     - name: xAxisLabelRotation
       title: Label rotation

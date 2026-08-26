@@ -1,5 +1,5 @@
-title: Ridgeline Plot
-name: ridge
+title: Strip Plot
+name: stripmean
 jus: '3.0'
 stage: 0
 compilerMode: tame
@@ -38,19 +38,40 @@ children:
             stretchFactor: 1
             children:
               - type: Label
-                label: Ridges
+                label: Data Points
                 children:
                   - type: TextBox
-                    name: scale
+                    name: jitterWidth
                     format: number
+                  - type: TextBox
+                    name: pointSize
+                    format: number
+                  - type: TextBox
+                    name: pointOpacity
+                    format: number
+              - type: Label
+                label: Mean
+                children:
                   - type: CheckBox
-                    name: gradient
+                    name: showMean
+                  - type: ComboBox
+                    name: errorBars
+                  - type: TextBox
+                    name: ciWidth
+                    suffix: '%'
+                    format: number
+                    enable: (errorBars:ci)
           - type: LayoutBox
             cell:
               column: 1
               row: 0
             stretchFactor: 1
             children:
+              - type: Label
+                label: Plot Orientation
+                children:
+                  - type: CheckBox
+                    name: flipAxes
               - type: Label
                 label: Missing Values
                 children:
@@ -160,6 +181,8 @@ children:
                     name: xAxisLabelRotation
                     suffix: "°"
                     format: number
+                  - type: CheckBox
+                    name: xAxisLabelFontSizeRevLabels
           - type: LayoutBox
             cell:
               column: 1
@@ -176,7 +199,26 @@ children:
                     name: yAxisLabelRotation
                     suffix: "°"
                     format: number
-
+              - type: Label
+                label: Range
+                children:
+                  - type: RadioButton
+                    name: yAxisRangeType_auto
+                    optionName: yAxisRangeType
+                    optionPart: auto
+                  - type: RadioButton
+                    name: yAxisRangeType_manual
+                    optionName: yAxisRangeType
+                    optionPart: manual
+                    children:
+                      - type: TextBox
+                        name: yAxisRangeMin
+                        format: number
+                        enable: (yAxisRangeType:manual)
+                      - type: TextBox
+                        name: yAxisRangeMax
+                        format: number
+                        enable: (yAxisRangeType:manual)
   - type: CollapseBox
     label: Legend
     collapsed: true

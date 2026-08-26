@@ -1,49 +1,53 @@
 ---
-name:  pareto
-title: Pareto Plot
+name:  wordcloud
+title: Word Cloud
 category: plots
-menuGroup: Other
+menuGroup: Ranking
 version: '1.0.0'
 jas: '1.2'
 
 options:
     - name: data
       type: Data
-      description:
-          R: the data as a data frame
 
-    - name: x
-      title: X-Axis
+    - name: words
+      title: Variable
       type: Variable
+      default: null
       suggested:
         - nominal
       permitted:
         - factor
-      description:
-          R: >
-            a string naming the variable from `data` that contains the
-            values used for the chart
 
     - name: counts
-      title: 'Counts (optional)'
+      title: Counts (optional)
       type: Variable
       default: null
       suggested:
         - continuous
       permitted:
         - numeric
-      description:
-          R: >
-            a string naming the variable from `data` that contains the
-            counts for the values (optional)
 
-    - name: barWidth
-      title: Width
+    - name: maxWords
+      title: Maximum words
       type: Number
-      default: 0.6
-      min: 0
+      default: 50
+      min: 5
+      max: 150
 
+    - name: minFontSize
+      title: Smallest font size
+      type: Number
+      default: 8
+      min: 4
+      max: 30
 
+    - name: maxFontSize
+      title: Largest font size
+      type: Number
+      default: 28
+      min: 10
+      max: 60
 
     - name: title
       title: Title text
@@ -153,78 +157,6 @@ options:
           title: Bold Italic
       default: plain
 
-    - name: xLabel
-      title: Title text
-      type: String
-      default: ''
-
-    - name: xLabelAlign
-      title: Align
-      type: List
-      options:
-        - name: left
-          title: Left
-        - name: center
-          title: Center
-        - name: right
-          title: Right
-      default: center
-
-    - name: xLabelFontSize
-      title: Font size
-      type: Number
-      default: 16
-
-    - name: xLabelFontFace
-      title: Font face
-      type: List
-      options:
-        - name: plain
-          title: Plain
-        - name: bold
-          title: Bold
-        - name: italic
-          title: Italic
-        - name: bold-italic
-          title: Bold Italic
-      default: plain
-
-    - name: yLabel
-      title: Title text
-      type: String
-      default: ''
-
-    - name: yLabelAlign
-      title: Align
-      type: List
-      options:
-        - name: left
-          title: Left
-        - name: center
-          title: Center
-        - name: right
-          title: Right
-      default: center
-
-    - name: yLabelFontSize
-      title: Font size
-      type: Number
-      default: 16
-
-    - name: yLabelFontFace
-      title: Font face
-      type: List
-      options:
-        - name: plain
-          title: Plain
-        - name: bold
-          title: Bold
-        - name: italic
-          title: Italic
-        - name: bold-italic
-          title: Bold Italic
-      default: plain
-
     - name: titleType
       title: ""
       type: List
@@ -235,33 +167,5 @@ options:
           title: Plot Subtitle
         - name: caption
           title: Plot Caption
-        - name: xTitle
-          title: X-Axis Title
-        - name: yTitle
-          title: Y-Axis Title
       default: title
-
-    - name: yAxisLabelFontSize
-      title: Label font size
-      type: Number
-      default: 12
-
-    - name: yAxisLabelRotation
-      title: Label rotation
-      type: Number
-      default: 0
-      min: 0
-      max: 360
-
-    - name: xAxisLabelFontSize
-      title: Label font size
-      type: Number
-      default: 12
-
-    - name: xAxisLabelRotation
-      title: Label rotation
-      type: Number
-      default: 0
-      min: 0
-      max: 360
 ...

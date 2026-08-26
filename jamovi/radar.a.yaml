@@ -1,49 +1,50 @@
 ---
-name:  pareto
-title: Pareto Plot
+name:  radar
+title: Radar Plot
 category: plots
-menuGroup: Other
+menuGroup: Ranking
 version: '1.0.0'
 jas: '1.2'
 
 options:
     - name: data
       type: Data
-      description:
-          R: the data as a data frame
 
-    - name: x
-      title: X-Axis
+    - name: vars
+      title: Variables
+      type: Variables
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: group
+      title: Grouping Variable
       type: Variable
       suggested:
         - nominal
       permitted:
         - factor
-      description:
-          R: >
-            a string naming the variable from `data` that contains the
-            values used for the chart
-
-    - name: counts
-      title: 'Counts (optional)'
-      type: Variable
       default: null
-      suggested:
-        - continuous
-      permitted:
-        - numeric
-      description:
-          R: >
-            a string naming the variable from `data` that contains the
-            counts for the values (optional)
 
-    - name: barWidth
-      title: Width
+    - name: fillOpacity
+      title: Fill opacity
       type: Number
-      default: 0.6
+      default: 0.25
       min: 0
+      max: 1
 
+    - name: lineWidth
+      title: Line width
+      type: Number
+      default: 0.7
+      min: 0.1
+      max: 3
 
+    - name: showGrid
+      title: Show grid rings
+      type: Bool
+      default: true
 
     - name: title
       title: Title text
@@ -153,78 +154,6 @@ options:
           title: Bold Italic
       default: plain
 
-    - name: xLabel
-      title: Title text
-      type: String
-      default: ''
-
-    - name: xLabelAlign
-      title: Align
-      type: List
-      options:
-        - name: left
-          title: Left
-        - name: center
-          title: Center
-        - name: right
-          title: Right
-      default: center
-
-    - name: xLabelFontSize
-      title: Font size
-      type: Number
-      default: 16
-
-    - name: xLabelFontFace
-      title: Font face
-      type: List
-      options:
-        - name: plain
-          title: Plain
-        - name: bold
-          title: Bold
-        - name: italic
-          title: Italic
-        - name: bold-italic
-          title: Bold Italic
-      default: plain
-
-    - name: yLabel
-      title: Title text
-      type: String
-      default: ''
-
-    - name: yLabelAlign
-      title: Align
-      type: List
-      options:
-        - name: left
-          title: Left
-        - name: center
-          title: Center
-        - name: right
-          title: Right
-      default: center
-
-    - name: yLabelFontSize
-      title: Font size
-      type: Number
-      default: 16
-
-    - name: yLabelFontFace
-      title: Font face
-      type: List
-      options:
-        - name: plain
-          title: Plain
-        - name: bold
-          title: Bold
-        - name: italic
-          title: Italic
-        - name: bold-italic
-          title: Bold Italic
-      default: plain
-
     - name: titleType
       title: ""
       type: List
@@ -235,33 +164,126 @@ options:
           title: Plot Subtitle
         - name: caption
           title: Plot Caption
-        - name: xTitle
-          title: X-Axis Title
-        - name: yTitle
-          title: Y-Axis Title
       default: title
 
-    - name: yAxisLabelFontSize
+    - name: legendTitle
+      title: Title text
+      type: String
+      default: ''
+
+    - name: legendTitleFontSize
+      title: Title font size
+      type: Number
+      default: 16
+
+    - name: legendTitleFontFace
+      title: Title font face
+      type: List
+      options:
+        - name: plain
+          title: Plain
+        - name: bold
+          title: Bold
+        - name: italic
+          title: Italic
+        - name: bold-italic
+          title: Bold Italic
+      default: plain
+
+    - name: legendLabelFontSize
       title: Label font size
       type: Number
-      default: 12
+      default: 16
 
-    - name: yAxisLabelRotation
-      title: Label rotation
+    - name: legendLabelFontFace
+      title: Label font face
+      type: List
+      options:
+        - name: plain
+          title: Plain
+        - name: bold
+          title: Bold
+        - name: italic
+          title: Italic
+        - name: bold-italic
+          title: Bold Italic
+      default: plain
+
+    - name: legendKeyWidth
+      title: Key width
       type: Number
-      default: 0
+      default: 0.6
       min: 0
-      max: 360
 
-    - name: xAxisLabelFontSize
-      title: Label font size
+    - name: legendKeyHeight
+      title: Key height
       type: Number
-      default: 12
-
-    - name: xAxisLabelRotation
-      title: Label rotation
-      type: Number
-      default: 0
+      default: 0.6
       min: 0
-      max: 360
+
+    - name: legenPositionType
+      title: ""
+      type: List
+      options:
+        - name: outside
+          title: Outside
+        - name: inside
+          title: Inside
+        - name: hide
+          title: Hide
+      default: outside
+
+    - name: legendPosition
+      title: Position
+      type: List
+      options:
+        - name: top
+          title: Top
+        - name: right
+          title: Right
+        - name: bottom
+          title: Bottom
+        - name: left
+          title: Left
+      default: right
+
+    - name: legendJustification
+      title: Justification
+      type: List
+      options:
+        - name: center
+          title: Center
+        - name: top
+          title: Top
+        - name: right
+          title: Right
+        - name: bottom
+          title: Bottom
+        - name: left
+          title: Left
+      default: center
+
+    - name: legendPositionX
+      title: X-position
+      type: Number
+      default: 0.8
+      min: 0
+      max: 1
+
+    - name: legendPositionY
+      title: Y-position
+      type: Number
+      default: 0.5
+      min: 0
+      max: 1
+
+    - name: legendDirection
+      title: Direction
+      type: List
+      options:
+        - name: horizontal
+          title: Horizontal
+        - name: vertical
+          title: Vertical
+      default: vertical
 ...

@@ -1,5 +1,5 @@
-title: Ridgeline Plot
-name: ridge
+title: Density Plot
+name: dens
 jus: '3.0'
 stage: 0
 compilerMode: tame
@@ -38,13 +38,17 @@ children:
             stretchFactor: 1
             children:
               - type: Label
-                label: Ridges
+                label: Density
                 children:
                   - type: TextBox
-                    name: scale
+                    name: bwAdjust
                     format: number
-                  - type: CheckBox
-                    name: gradient
+                  - type: TextBox
+                    name: densityOpacity
+                    format: number
+                  - type: TextBox
+                    name: densityLineSize
+                    format: number
           - type: LayoutBox
             cell:
               column: 1
@@ -52,10 +56,16 @@ children:
             stretchFactor: 1
             children:
               - type: Label
-                label: Missing Values
+                label: Grupowanie
                 children:
                   - type: CheckBox
-                    name: naOmit
+                    name: densFacet
+                    enable: (group)
+              - type: Label
+                label: Plot Orientation
+                children:
+                  - type: CheckBox
+                    name: flipAxes
   - type: CollapseBox
     label: Plot & Axis Titles
     collapsed: true
@@ -160,6 +170,26 @@ children:
                     name: xAxisLabelRotation
                     suffix: "°"
                     format: number
+              - type: Label
+                label: Range
+                children:
+                  - type: RadioButton
+                    name: xAxisRangeType_auto
+                    optionName: xAxisRangeType
+                    optionPart: auto
+                  - type: RadioButton
+                    name: xAxisRangeType_manual
+                    optionName: xAxisRangeType
+                    optionPart: manual
+                    children:
+                      - type: TextBox
+                        name: xAxisRangeMin
+                        format: number
+                        enable: (xAxisRangeType:manual)
+                      - type: TextBox
+                        name: xAxisRangeMax
+                        format: number
+                        enable: (xAxisRangeType:manual)
           - type: LayoutBox
             cell:
               column: 1
@@ -176,7 +206,26 @@ children:
                     name: yAxisLabelRotation
                     suffix: "°"
                     format: number
-
+              - type: Label
+                label: Range
+                children:
+                  - type: RadioButton
+                    name: yAxisRangeType_auto
+                    optionName: yAxisRangeType
+                    optionPart: auto
+                  - type: RadioButton
+                    name: yAxisRangeType_manual
+                    optionName: yAxisRangeType
+                    optionPart: manual
+                    children:
+                      - type: TextBox
+                        name: yAxisRangeMin
+                        format: number
+                        enable: (yAxisRangeType:manual)
+                      - type: TextBox
+                        name: yAxisRangeMax
+                        format: number
+                        enable: (yAxisRangeType:manual)
   - type: CollapseBox
     label: Legend
     collapsed: true

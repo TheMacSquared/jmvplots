@@ -1,5 +1,5 @@
-title: Ridgeline Plot
-name: ridge
+title: Correlogram
+name: corrgram
 jus: '3.0'
 stage: 0
 compilerMode: tame
@@ -9,18 +9,10 @@ children:
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Variable
+        label: Variables
         children:
           - type: VariablesListBox
-            name: var
-            maxItemCount: 1
-            isTarget: true
-      - type: TargetLayoutBox
-        label: Grouping Variable
-        children:
-          - type: VariablesListBox
-            name: group
-            maxItemCount: 1
+            name: vars
             isTarget: true
   - type: CollapseBox
     label: General Options
@@ -38,13 +30,12 @@ children:
             stretchFactor: 1
             children:
               - type: Label
-                label: Ridges
+                label: Method
                 children:
-                  - type: TextBox
-                    name: scale
-                    format: number
-                  - type: CheckBox
-                    name: gradient
+                  - type: ComboBox
+                    name: method
+                  - type: ComboBox
+                    name: shape
           - type: LayoutBox
             cell:
               column: 1
@@ -52,10 +43,15 @@ children:
             stretchFactor: 1
             children:
               - type: Label
-                label: Missing Values
+                label: Coefficients
                 children:
                   - type: CheckBox
-                    name: naOmit
+                    name: showCoef
+                    children:
+                      - type: TextBox
+                        name: coefDigits
+                        format: number
+                        enable: (showCoef)
   - type: CollapseBox
     label: Plot & Axis Titles
     collapsed: true
@@ -176,7 +172,6 @@ children:
                     name: yAxisLabelRotation
                     suffix: "°"
                     format: number
-
   - type: CollapseBox
     label: Legend
     collapsed: true

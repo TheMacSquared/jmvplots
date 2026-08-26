@@ -1,5 +1,5 @@
-title: Ridgeline Plot
-name: ridge
+title: Violin Plot
+name: violin
 jus: '3.0'
 stage: 0
 compilerMode: tame
@@ -16,10 +16,17 @@ children:
             maxItemCount: 1
             isTarget: true
       - type: TargetLayoutBox
-        label: Grouping Variable
+        label: Grouping Variable 1
         children:
           - type: VariablesListBox
-            name: group
+            name: group1
+            maxItemCount: 1
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Grouping Variable 2
+        children:
+          - type: VariablesListBox
+            name: group2
             maxItemCount: 1
             isTarget: true
   - type: CollapseBox
@@ -38,19 +45,43 @@ children:
             stretchFactor: 1
             children:
               - type: Label
-                label: Ridges
+                label: Violin Element
                 children:
+                  - type: CheckBox
+                    name: trim
                   - type: TextBox
-                    name: scale
+                    name: violinOpacity
                     format: number
                   - type: CheckBox
-                    name: gradient
+                    name: innerBox
+                  - type: TextBox
+                    name: innerBoxWidth
+                    format: number
+                    enable: (innerBox)
+              - type: Label
+                label: Data Points
+                children:
+                  - type: CheckBox
+                    name: showPoints
+                  - type: TextBox
+                    name: pointJitter
+                    format: number
+                    enable: (showPoints)
+                  - type: TextBox
+                    name: pointOpacity
+                    format: number
+                    enable: (showPoints)
           - type: LayoutBox
             cell:
               column: 1
               row: 0
             stretchFactor: 1
             children:
+              - type: Label
+                label: Plot Orientation
+                children:
+                  - type: CheckBox
+                    name: flipAxes
               - type: Label
                 label: Missing Values
                 children:
@@ -160,6 +191,8 @@ children:
                     name: xAxisLabelRotation
                     suffix: "°"
                     format: number
+                  - type: CheckBox
+                    name: xAxisLabelFontSizeRevLabels
           - type: LayoutBox
             cell:
               column: 1
@@ -176,7 +209,26 @@ children:
                     name: yAxisLabelRotation
                     suffix: "°"
                     format: number
-
+              - type: Label
+                label: Range
+                children:
+                  - type: RadioButton
+                    name: yAxisRangeType_auto
+                    optionName: yAxisRangeType
+                    optionPart: auto
+                  - type: RadioButton
+                    name: yAxisRangeType_manual
+                    optionName: yAxisRangeType
+                    optionPart: manual
+                    children:
+                      - type: TextBox
+                        name: yAxisRangeMin
+                        format: number
+                        enable: (yAxisRangeType:manual)
+                      - type: TextBox
+                        name: yAxisRangeMax
+                        format: number
+                        enable: (yAxisRangeType:manual)
   - type: CollapseBox
     label: Legend
     collapsed: true

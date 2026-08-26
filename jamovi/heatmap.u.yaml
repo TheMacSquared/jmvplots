@@ -1,5 +1,5 @@
-title: Ridgeline Plot
-name: ridge
+title: Heatmap
+name: heatmap
 jus: '3.0'
 stage: 0
 compilerMode: tame
@@ -9,19 +9,29 @@ children:
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Variable
+        label: X Variable
         children:
           - type: VariablesListBox
-            name: var
+            name: x
             maxItemCount: 1
             isTarget: true
       - type: TargetLayoutBox
-        label: Grouping Variable
+        label: Y Variable
         children:
           - type: VariablesListBox
-            name: group
+            name: y
             maxItemCount: 1
             isTarget: true
+      - type: TargetLayoutBox
+        label: Value Variable (optional)
+        children:
+          - type: VariablesListBox
+            name: value
+            maxItemCount: 1
+            isTarget: true
+          - type: ComboBox
+            name: aggregation
+            enable: (value)
   - type: CollapseBox
     label: General Options
     collapsed: true
@@ -31,31 +41,16 @@ children:
         margin: large
         stretchFactor: 1
         children:
-          - type: LayoutBox
-            cell:
-              column: 0
-              row: 0
-            stretchFactor: 1
+          - type: Label
+            label: Cell Values
             children:
-              - type: Label
-                label: Ridges
+              - type: CheckBox
+                name: showValues
                 children:
                   - type: TextBox
-                    name: scale
+                    name: valueDigits
                     format: number
-                  - type: CheckBox
-                    name: gradient
-          - type: LayoutBox
-            cell:
-              column: 1
-              row: 0
-            stretchFactor: 1
-            children:
-              - type: Label
-                label: Missing Values
-                children:
-                  - type: CheckBox
-                    name: naOmit
+                    enable: (showValues)
   - type: CollapseBox
     label: Plot & Axis Titles
     collapsed: true
@@ -176,7 +171,6 @@ children:
                     name: yAxisLabelRotation
                     suffix: "°"
                     format: number
-
   - type: CollapseBox
     label: Legend
     collapsed: true

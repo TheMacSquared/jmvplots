@@ -1,0 +1,15 @@
+---
+name:  dens
+title: Density Plot
+jrs:   '1.1'
+
+items:
+    - name: plot
+      title: ''
+      type: Image
+      description: an image containing the density plot
+      width: 500
+      height: 500
+      renderFun: .densPlot
+
+...

@@ -1,0 +1,14 @@
+---
+name:  waffle
+title: Waffle Plot
+jrs:   '1.1'
+
+items:
+    - name: plot
+      title: ''
+      type: Image
+      description: an image containing the waffle plot
+      width: 500
+      height: 500
+      renderFun: .wafflePlot
+...

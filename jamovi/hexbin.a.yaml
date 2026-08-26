@@ -2,7 +2,7 @@
 name:  hexbin
 title: Hexbin Plot
 category: plots
-menuGroup: More
+menuGroup: Correlation
 version: '1.0.0'
 jas: '1.2'
 

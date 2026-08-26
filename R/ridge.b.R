@@ -49,7 +49,33 @@ ridgeClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             color = theme$color[1]
                         ) +
                         ggtheme +
-                        paletteFillGradient(theme)
+                        paletteFillGradient(theme) +
+                        # the gradient legend follows the user's legend options
+                        formatLegend(self$options)
+
+                    # a colourbar squeezed to the key size is unreadable, so
+                    # stretch it to 6x the key size along its direction while
+                    # keeping the key options as the thickness
+                    if (self$options$legenPositionType != "hide") {
+                        horizontal <-
+                            (self$options$legenPositionType == "outside" &&
+                                self$options$legendPosition %in% c("top", "bottom")) ||
+                            (self$options$legenPositionType == "inside" &&
+                                self$options$legendDirection == "horizontal")
+                        if (horizontal) {
+                            barw <- ggplot2::unit(self$options$legendKeyWidth * 6, "cm")
+                            barh <- ggplot2::unit(self$options$legendKeyHeight, "cm")
+                        } else {
+                            barw <- ggplot2::unit(self$options$legendKeyWidth, "cm")
+                            barh <- ggplot2::unit(self$options$legendKeyHeight * 6, "cm")
+                        }
+                        p <- p + ggplot2::guides(
+                            fill = ggplot2::guide_colorbar(
+                                barwidth = barw,
+                                barheight = barh
+                            )
+                        )
+                    }
                 } else {
                     p <- ggplot(data, aes(x = x, y = y)) +
                         ggridges::geom_density_ridges(
@@ -64,11 +90,14 @@ ridgeClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 labelDefaults <- list(
                     xLabel = self$options$var,
-                    yLabel = self$options$group
+                    yLabel = self$options$group,
+                    # the gradient legend maps the x values, so it defaults
+                    # to the variable's name
+                    groupLabel = self$options$var
                 )
                 p <- p +
-                    setLabels(options = self$options, defaults = labelDefaults, legend = FALSE) +
-                    formatLabels(options = self$options, legend = FALSE)
+                    setLabels(options = self$options, defaults = labelDefaults) +
+                    formatLabels(options = self$options)
 
                 p <- autoscalePlotBreaks(p, image$width, image$height)
 

@@ -1,0 +1,14 @@
+---
+name:  stackbar
+title: Stacked Bar Plot
+jrs:   '1.1'
+
+items:
+    - name: plot
+      title: ''
+      type: Image
+      description: an image containing the stacked bar plot
+      width: 500
+      height: 500
+      renderFun: .stackbarPlot
+...

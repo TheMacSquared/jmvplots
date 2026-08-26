@@ -1,49 +1,86 @@
 ---
-name:  pareto
-title: Pareto Plot
+name:  raincloud
+title: Raincloud Plot
 category: plots
-menuGroup: Other
+menuGroup: Distribution
 version: '1.0.0'
 jas: '1.2'
 
 options:
     - name: data
       type: Data
-      description:
-          R: the data as a data frame
 
-    - name: x
-      title: X-Axis
+    - name: var
+      title: Variable
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: group
+      title: Grouping Variable
       type: Variable
       suggested:
         - nominal
       permitted:
         - factor
-      description:
-          R: >
-            a string naming the variable from `data` that contains the
-            values used for the chart
-
-    - name: counts
-      title: 'Counts (optional)'
-      type: Variable
       default: null
-      suggested:
-        - continuous
-      permitted:
-        - numeric
-      description:
-          R: >
-            a string naming the variable from `data` that contains the
-            counts for the values (optional)
 
-    - name: barWidth
-      title: Width
+    - name: naOmit
+      title: Exclude cases listwise
+      type: Bool
+      default: false
+
+    - name: cloudScale
+      title: Cloud width
       type: Number
-      default: 0.6
+      default: 1
+      min: 0.2
+      max: 3
+
+    - name: showBox
+      title: Show box plot
+      type: Bool
+      default: true
+
+    - name: boxWidth
+      title: Box width
+      type: Number
+      default: 0.12
+      min: 0.02
+      max: 0.5
+
+    - name: showPoints
+      title: Show data points
+      type: Bool
+      default: true
+
+    - name: jitterWidth
+      title: Jitter width
+      type: Number
+      default: 0.08
       min: 0
+      max: 0.3
 
+    - name: pointSize
+      title: Point size
+      type: Number
+      default: 1.6
+      min: 0.1
+      max: 6
 
+    - name: pointOpacity
+      title: Point opacity
+      type: Number
+      default: 0.5
+      min: 0
+      max: 1
+
+    - name: flipAxes
+      title: Flip axes
+      type: Bool
+      default: true
 
     - name: title
       title: Title text
@@ -246,6 +283,26 @@ options:
       type: Number
       default: 12
 
+    - name: yAxisRangeType
+      title: Y-Axis Range
+      type: List
+      options:
+        - name: auto
+          title: Auto
+        - name: manual
+          title: Manual
+      default: auto
+
+    - name: yAxisRangeMin
+      title: Min
+      type: Number
+      default: 0
+
+    - name: yAxisRangeMax
+      title: Max
+      type: Number
+      default: 10
+
     - name: yAxisLabelRotation
       title: Label rotation
       type: Number
@@ -257,6 +314,11 @@ options:
       title: Label font size
       type: Number
       default: 12
+
+    - name: xAxisLabelFontSizeRevLabels
+      title: Reverse labels
+      type: Bool
+      default: false
 
     - name: xAxisLabelRotation
       title: Label rotation

@@ -1,5 +1,5 @@
-title: Ridgeline Plot
-name: ridge
+title: Parallel Coordinates Plot
+name: parcoord
 jus: '3.0'
 stage: 0
 compilerMode: tame
@@ -9,11 +9,10 @@ children:
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Variable
+        label: Variables
         children:
           - type: VariablesListBox
-            name: var
-            maxItemCount: 1
+            name: vars
             isTarget: true
       - type: TargetLayoutBox
         label: Grouping Variable
@@ -38,24 +37,14 @@ children:
             stretchFactor: 1
             children:
               - type: Label
-                label: Ridges
+                label: Lines
                 children:
                   - type: TextBox
-                    name: scale
+                    name: lineOpacity
                     format: number
-                  - type: CheckBox
-                    name: gradient
-          - type: LayoutBox
-            cell:
-              column: 1
-              row: 0
-            stretchFactor: 1
-            children:
-              - type: Label
-                label: Missing Values
-                children:
-                  - type: CheckBox
-                    name: naOmit
+                  - type: TextBox
+                    name: lineWidth
+                    format: number
   - type: CollapseBox
     label: Plot & Axis Titles
     collapsed: true
@@ -176,7 +165,6 @@ children:
                     name: yAxisLabelRotation
                     suffix: "°"
                     format: number
-
   - type: CollapseBox
     label: Legend
     collapsed: true

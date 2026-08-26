@@ -1,0 +1,14 @@
+---
+name:  stripmean
+title: Strip Plot
+jrs:   '1.1'
+
+items:
+    - name: plot
+      title: ''
+      type: Image
+      description: an image containing the strip plot with mean and error bars
+      width: 500
+      height: 500
+      renderFun: .stripPlot
+...

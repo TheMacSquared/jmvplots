@@ -2,7 +2,7 @@
 name:  jmvbar
 title: Bar Plot
 category: plots
-menuGroup: .
+menuGroup: Ranking
 version: '1.0.0'
 jas: '1.2'
 

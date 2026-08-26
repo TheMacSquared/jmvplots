@@ -2,7 +2,7 @@
 name:  jmvline
 title: Line Plot
 category: plots
-menuGroup: .
+menuGroup: Evolution
 version: '1.0.0'
 jas: '1.2'
 

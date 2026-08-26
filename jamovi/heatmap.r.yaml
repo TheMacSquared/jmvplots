@@ -1,0 +1,15 @@
+---
+name:  heatmap
+title: Heatmap
+jrs:   '1.1'
+
+items:
+    - name: plot
+      title: ''
+      type: Image
+      description: an image containing the heatmap
+      width: 500
+      height: 500
+      renderFun: .heatmapPlot
+
+...

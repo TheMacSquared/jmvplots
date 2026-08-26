@@ -2,7 +2,7 @@
 name:  jmvhist
 title: Histogram
 category: plots
-menuGroup: .
+menuGroup: Distribution
 version: '1.0.0'
 jas: '1.2'
 

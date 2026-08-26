@@ -2,7 +2,7 @@
 name:  scat
 title: Scatter Plot
 category: plots
-menuGroup: .
+menuGroup: Correlation
 version: '1.0.0'
 jas: '1.2'
 
