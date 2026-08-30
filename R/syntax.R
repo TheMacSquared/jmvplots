@@ -140,10 +140,21 @@ formatValueForCode <- function(val) {
         return(quoteString(val))
     }
     if (is.function(val)) {
-        if (identical(val, base::rev)) {
-            return("rev")
+        # deparse(substitute(val)) cannot recover the caller's expression here
+        # (it always yields "val"), so match the functions we actually put into
+        # call lists by identity and fall back to a readable placeholder.
+        knownFunctions <- list(
+            "rev" = base::rev,
+            "mean" = base::mean,
+            "median" = stats::median,
+            "jmvcore::wrapLabels" = jmvcore::wrapLabels
+        )
+        for (fnName in names(knownFunctions)) {
+            if (identical(val, knownFunctions[[fnName]])) {
+                return(fnName)
+            }
         }
-        return(deparse(substitute(val)))
+        return("function(x) x")
     }
 
     return(paste(deparse(val), collapse = " "))
