@@ -68,3 +68,9 @@ man/
 npm-debug.log
 inst/doc
 tests/testthat/Rplots.pdf
+
+# generowane przez jamovi-compiler (jmc) przy kazdym buildzie — nie do repo.
+# Naglowki .h.R sa odtwarzane z jamovi/*.a.yaml, a inst/i18n/*.json z jamovi/i18n/.
+# Repo nadrzedne (jamovi-upwr) ignoruje je tak samo: **/R/*.h.R
+R/*.h.R
+inst/i18n/

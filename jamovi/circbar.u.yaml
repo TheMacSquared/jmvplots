@@ -19,7 +19,7 @@ children:
         label: Value Variable (optional)
         children:
           - type: VariablesListBox
-            name: y
+            name: 'y'
             maxItemCount: 1
             isTarget: true
   - type: CollapseBox
@@ -164,5 +164,17 @@ children:
                     format: number
                   - type: TextBox
                     name: xAxisLabelRotation
-                    suffix: "°"
+                    suffix: °
                     format: number
+  - type: LayoutBox
+    margin: large
+    children:
+      - type: TextBox
+        name: yAxisLabelFontSize
+        format: number
+  - type: LayoutBox
+    margin: large
+    children:
+      - type: TextBox
+        name: yAxisLabelRotation
+        format: number
