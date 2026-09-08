@@ -66,7 +66,7 @@ radarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 vars <- unlist(self$options$vars)
                 K <- length(vars)
                 if (nrow(df) == 0 || K < 3) {
-                    return(FALSE)
+                    stop("Wykres radarowy wymaga kompletnych obserwacji dla co najmniej 3 zmiennych.", call. = FALSE)
                 }
 
                 hasGroup <- "group" %in% colnames(df)

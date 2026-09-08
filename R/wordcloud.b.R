@@ -56,7 +56,7 @@ wordcloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 df <- image$state
                 if (nrow(df) == 0) {
-                    return(FALSE)
+                    stop("Brak słów o dodatniej częstości dla chmury słów.", call. = FALSE)
                 }
 
                 minFontSize <- self$options$minFontSize
@@ -69,7 +69,7 @@ wordcloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 placed <- private$.placeWords(df$word, sizes)
                 if (nrow(placed) == 0) {
-                    return(FALSE)
+                    stop("Nie udało się rozmieścić żadnego słowa w chmurze słów.", call. = FALSE)
                 }
 
                 # colours are purely decorative (no legend); the palette

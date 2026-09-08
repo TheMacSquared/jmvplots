@@ -85,7 +85,7 @@ waffleClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 df <- image$state
                 total <- sum(df$n)
                 if (nrow(df) == 0 || total <= 0) {
-                    return(FALSE)
+                    stop("Wykres waflowy wymaga danych o dodatniej sumie liczności.", call. = FALSE)
                 }
 
                 # wrap long legend labels (colours still come from ggtheme)
@@ -154,7 +154,7 @@ waffleClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     })
                     tiles <- do.call(rbind, parts)
                     if (is.null(tiles) || nrow(tiles) == 0) {
-                        return(FALSE)
+                        stop("Nie udało się utworzyć żadnych kafelków wykresu waflowego.", call. = FALSE)
                     }
                     tiles$facet <- factor(tiles$facet, levels = levels(df$facet))
                 } else {

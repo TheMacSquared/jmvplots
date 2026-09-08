@@ -60,7 +60,7 @@ parcoordClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 long <- do.call(rbind, lapply(seq_along(vars), function(k) {
                     part <- data.frame(
                         id = df$id,
-                        varIndex = k,
+                        varIndex = rep(k, nrow(df)),
                         value = df[[vars[k]]]
                     )
                     if (!is.null(group)) {
@@ -80,7 +80,7 @@ parcoordClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 vars <- unlist(self$options$vars)
                 K <- length(vars)
                 if (nrow(df) == 0 || K < 2) {
-                    return(FALSE)
+                    stop("Wykres współrzędnych równoległych wymaga kompletnych obserwacji dla co najmniej 2 zmiennych.", call. = FALSE)
                 }
 
                 hasGroup <- "group" %in% colnames(df)

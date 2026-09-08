@@ -95,7 +95,7 @@ treemapClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 df <- image$state
                 if (nrow(df) == 0) {
-                    return(FALSE)
+                    stop("Brak kategorii z dodatnią sumą wartości dla mapy drzewiastej.", call. = FALSE)
                 }
 
                 # wrap long legend labels (colours still come from ggtheme)

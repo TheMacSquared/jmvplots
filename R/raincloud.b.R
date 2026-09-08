@@ -50,7 +50,7 @@ raincloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 }
                 data <- data |> dplyr::filter(!is.na(y))
                 if (nrow(data) == 0) {
-                    return(FALSE)
+                    stop("Brak obserwacji bez braków danych dla wykresu deszczowego.", call. = FALSE)
                 }
 
                 levelsX <- levels(data$x)

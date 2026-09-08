@@ -53,7 +53,7 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 data <- image$state
                 if (nrow(data) == 0) {
-                    return(FALSE)
+                    stop("Brak obserwacji dla skumulowanego wykresu słupkowego.", call. = FALSE)
                 }
 
                 # wrap long legend labels (colours still come from ggtheme)

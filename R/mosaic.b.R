@@ -55,7 +55,7 @@ mosaicClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 df <- image$state
                 total <- sum(df$n)
                 if (nrow(df) == 0 || total <= 0) {
-                    return(FALSE)
+                    stop("Wykres mozaikowy wymaga danych o dodatniej sumie liczności.", call. = FALSE)
                 }
 
                 # wrap long legend labels (colours still come from ggtheme)
