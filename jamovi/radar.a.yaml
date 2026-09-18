@@ -27,6 +27,20 @@ options:
         - factor
       default: null
 
+    - name: scaling
+      title: Axis scaling
+      type: List
+      options:
+        - name: minmax
+          title: Min–max of observations
+        - name: robust
+          title: Robust min–max (5th–95th percentile)
+        - name: pctmax
+          title: Percent of the largest group mean
+        - name: percentile
+          title: Percentile ranks
+      default: minmax
+
     - name: fillOpacity
       title: Fill opacity
       type: Number

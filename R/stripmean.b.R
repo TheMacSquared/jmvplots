@@ -49,15 +49,53 @@ stripmeanClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         dplyr::filter(!is.na(x) & !is.na(y))
                 }
 
-                p <- ggplot(data, aes(x = x, y = y)) +
-                    ggplot2::geom_jitter(
-                        width = self$options$jitterWidth,
-                        height = 0,
-                        size = self$options$pointSize,
-                        alpha = self$options$pointOpacity,
-                        color = theme$color[1]
-                    ) +
-                    ggtheme
+                if (self$options$pointLayout == "swarm") {
+                    # the blank layer trains the discrete axis; the swarm is
+                    # then drawn at numeric positions around each level
+                    p <- ggplot(data, aes(x = x, y = y)) +
+                        ggplot2::geom_blank()
+                    ylims <- NULL
+                    if (self$options$yAxisRangeType == "manual") {
+                        ylims <- c(self$options$yAxisRangeMin, self$options$yAxisRangeMax)
+                    }
+                    unitsPerPx <- panelUnitsPerPx(p, image, self$options$flipAxes, yRange = ylims)
+
+                    swarm <- data[!is.na(data$y) & !is.na(data$x), ]
+                    nLevels <- nlevels(swarm$x)
+                    swarm$pos <- as.integer(swarm$x)
+                    if (self$options$xAxisLabelFontSizeRevLabels) {
+                        swarm$pos <- nLevels + 1 - swarm$pos
+                    }
+                    swarm$xs <- as.numeric(swarm$pos)
+                    for (i in unique(swarm$pos)) {
+                        sel <- swarm$pos == i
+                        swarm$xs[sel] <- i + swarmOffsets(
+                            swarm$y[sel],
+                            unitsPerPx,
+                            self$options$pointSize,
+                            band = 0.45
+                        )
+                    }
+                    p <- p +
+                        ggplot2::geom_point(
+                            data = swarm,
+                            mapping = aes(x = xs, y = y),
+                            size = self$options$pointSize,
+                            alpha = self$options$pointOpacity,
+                            color = theme$color[1]
+                        ) +
+                        ggtheme
+                } else {
+                    p <- ggplot(data, aes(x = x, y = y)) +
+                        ggplot2::geom_jitter(
+                            width = self$options$jitterWidth,
+                            height = 0,
+                            size = self$options$pointSize,
+                            alpha = self$options$pointOpacity,
+                            color = theme$color[1]
+                        ) +
+                        ggtheme
+                }
 
                 if (self$options$showMean) {
                     # summary statistics computed explicitly (instead of

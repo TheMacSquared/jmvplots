@@ -7,7 +7,12 @@ waffleClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
         inherit = waffleBase,
         private = list(
             .init = function() {
-                image <- self$results$plot
+                # estimate from the declared levels; .preparePlotData()
+                # refines it once empty panels are known
+                group2 <- self$options$group2
+                if (!is.null(group2)) {
+                    private$.setPlotSize(nlevels(factor(self$data[[group2]])))
+                }
             },
             .run = function() {
                 if (is.null(self$options$group)) {
@@ -74,6 +79,12 @@ waffleClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 # guard against negative weights
                 df <- df |> dplyr::filter(n >= 0)
+
+                if ("facet" %in% colnames(df)) {
+                    # facet_wrap() drops panels without any squares
+                    facetTotals <- tapply(df$n, df$facet, sum)
+                    private$.setPlotSize(sum(facetTotals > 0, na.rm = TRUE))
+                }
 
                 image$setState(df)
             },
@@ -284,6 +295,51 @@ waffleClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 return(p)
             },
             #### Helper functions ----
+            # coord_equal() fixes the panel aspect ratio, so a square image
+            # leaves empty bands around a row of panels; size the image to
+            # the panel grid that facet_wrap() will use instead
+            .setPlotSize = function(nPanels) {
+                if (nPanels < 2) {
+                    return()
+                }
+
+                rows <- self$options$rows
+                aspect <- ceiling(100 / rows) / rows
+                dims <- ggplot2::wrap_dims(nPanels)
+
+                panelWidth <- 250 * sqrt(aspect)
+                panelHeight <- 250 / sqrt(aspect)
+                shrink <- min(
+                    1,
+                    800 / (panelWidth * dims[2]),
+                    800 / (panelHeight * dims[1])
+                )
+                width <- panelWidth * dims[2] * shrink
+                # strip above each row of panels
+                height <- (panelHeight * shrink + 30) * dims[1]
+
+                if (self$options$legenPositionType == "outside") {
+                    if (self$options$legendPosition %in% c("left", "right")) {
+                        width <- width + 130
+                    } else {
+                        height <- height + 60
+                    }
+                }
+
+                # caption and plot margins, plus optional title / subtitle
+                height <- height + 50
+                if (nzchar(self$options$title)) {
+                    height <- height + 30
+                }
+                if (nzchar(self$options$subtitle)) {
+                    height <- height + 25
+                }
+
+                # keep room for the legend next to very flat panels
+                height <- max(height, 220)
+
+                self$results$plot$setSize(round(width), round(height))
+            },
             # setLabels()/formatLabels() expect axis label options that this
             # analysis does not define (the plot has no axes), so pad the
             # options with inert axis values; the axis elements are blanked

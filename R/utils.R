@@ -439,3 +439,113 @@ paletteFillGradient <- function(theme, n = 3) {
     ramp <- grDevices::colorRampPalette(c(theme$fill[1], cols))(32)
     ggplot2::scale_fill_gradientn(colours = ramp)
 }
+
+#' Tell the user how many variables a multi-variable plot needs
+#'
+#' Plots built from a list of variables stay empty until enough variables are
+#' selected; once the user has started selecting, say how many are required.
+#'
+#' @param self the analysis object (also used by `.()` for translation)
+#' @param nVars number of variables selected so far
+#' @param minVars minimum number of variables the plot requires
+#' @keywords internal
+insertMinVarsNotice <- function(self, nVars, minVars) {
+    if (nVars == 0) {
+        return(invisible(NULL))
+    }
+
+    notice <- jmvcore::Notice$new(
+        self$options,
+        name = ".minVars",
+        type = jmvcore::NoticeType$INFO,
+        content = jmvcore::format(
+            .("This plot requires at least {} variables."),
+            minVars
+        )
+    )
+    self$results$insert(1, notice)
+}
+
+#' Axis units per pixel of the plot built so far
+#'
+#' Point sizes are physical (mm) while positions are in axis units, so laying
+#' points out without overlap needs an estimate of both panel scales.
+#'
+#' @param p the ggplot built so far (cartesian, before any coord_flip)
+#' @param image the jamovi image (for its pixel size)
+#' @param flipAxes whether the plot will be drawn with flipped axes
+#' @param xRange,yRange axis ranges overriding the ones trained on `p`
+#' @keywords internal
+panelUnitsPerPx <- function(p, image, flipAxes, xRange = NULL, yRange = NULL) {
+    params <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]
+    if (is.null(xRange)) {
+        xRange <- params$x.range
+    }
+    if (is.null(yRange)) {
+        yRange <- params$y.range
+    }
+    # the panel takes roughly 80% of the image in either direction
+    xPx <- 0.8 * if (flipAxes) image$height else image$width
+    yPx <- 0.8 * if (flipAxes) image$width else image$height
+    list(x = diff(xRange) / xPx, y = diff(yRange) / yPx)
+}
+
+#' Beeswarm offsets for one group of points
+#'
+#' Points are taken in order of their value and each one is placed as close
+#' to the group axis as possible without overlapping the points already
+#' placed. Pure R; deterministic.
+#'
+#' @param y the values (no missing values)
+#' @param unitsPerPx list with the `x` and `y` axis units per pixel
+#' @param pointSize ggplot2 point size
+#' @param side `"both"` for a symmetric swarm, `"down"` for offsets <= 0 only
+#' @param band maximum absolute offset (x axis units); a swarm that would be
+#'   wider is compressed to fit, at the cost of overlapping points
+#' @return offsets along the group axis, in x axis units
+#' @keywords internal
+swarmOffsets <- function(y, unitsPerPx, pointSize, side = "both", band = Inf) {
+    n <- length(y)
+    if (n == 0) {
+        return(numeric(0))
+    }
+
+    # point diameter in pixels (size is in mm, plus the default stroke)
+    d <- pointSize * 72.27 / 25.4 + 1.5
+    yPx <- y / unitsPerPx$y
+
+    offsets <- numeric(n)
+    ord <- order(yPx)
+    placed <- integer(0)
+    for (i in ord) {
+        near <- placed[abs(yPx[placed] - yPx[i]) < d]
+        best <- 0
+        if (length(near) > 0) {
+            reach <- sqrt(d^2 - (yPx[near] - yPx[i])^2)
+            lo <- offsets[near] - reach
+            hi <- offsets[near] + reach
+            candidates <- c(0, lo, hi)
+            if (side == "down") {
+                candidates <- candidates[candidates >= 0]
+            }
+            free <- vapply(candidates, function(cand) {
+                !any(cand > lo + 1e-9 & cand < hi - 1e-9)
+            }, logical(1))
+            candidates <- candidates[free]
+            best <- candidates[which.min(abs(candidates))]
+        }
+        offsets[i] <- best
+        placed <- c(placed, i)
+    }
+
+    offsets <- offsets * unitsPerPx$x
+    widest <- max(abs(offsets))
+    if (widest > band) {
+        offsets <- offsets * band / widest
+    }
+    if (side == "down") {
+        offsets <- -offsets
+    }
+    offsets
+}
+

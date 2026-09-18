@@ -103,6 +103,9 @@ violinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     if (hasGroup2) {
                         p <- p +
                             ggplot2::geom_boxplot(
+                                # the constant white fill drops the fill
+                                # grouping, so group explicitly to dodge
+                                mapping = aes(group = interaction(x, factor(group, exclude = NULL))),
                                 width = self$options$innerBoxWidth,
                                 alpha = 1,
                                 outlier.shape = NA,
@@ -122,7 +125,9 @@ violinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     }
                 }
 
-                if (self$options$showPoints) {
+                if (self$options$showPoints && self$options$pointLayout == "swarm") {
+                    p <- p + private$.swarmLayer(p, data, hasGroup2, image, theme)
+                } else if (self$options$showPoints) {
                     if (hasGroup2) {
                         p <- p +
                             ggplot2::geom_point(
@@ -169,6 +174,60 @@ violinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 return(p)
             },
             #### Helper functions ----
+            # beeswarm points at numeric positions on the discrete axis; with
+            # two grouping variables each subgroup swarms around its own
+            # dodged position (same layout as position_dodge(0.9))
+            .swarmLayer = function(p, data, hasGroup2, image, theme) {
+                pointSize <- 1.5
+                ylims <- NULL
+                if (self$options$yAxisRangeType == "manual") {
+                    ylims <- c(self$options$yAxisRangeMin, self$options$yAxisRangeMax)
+                }
+                unitsPerPx <- panelUnitsPerPx(p, image, self$options$flipAxes, yRange = ylims)
+
+                swarm <- data[!is.na(data$y) & !is.na(data$x), ]
+                swarm$x <- factor(swarm$x, levels = levels(factor(data$x)))
+                nLevels <- nlevels(swarm$x)
+                pos <- as.integer(swarm$x)
+                if (self$options$xAxisLabelFontSizeRevLabels) {
+                    pos <- nLevels + 1 - pos
+                }
+                swarm$centre <- as.numeric(pos)
+                band <- 0.45
+
+                if (hasGroup2) {
+                    # missing subgroup = its own, last slot (as ggplot2 does)
+                    swarm$group <- factor(swarm$group, exclude = NULL)
+                    for (i in unique(swarm$centre)) {
+                        atX <- swarm$centre == i
+                        present <- sort(unique(as.integer(swarm$group[atX])))
+                        slot <- match(as.integer(swarm$group[atX]), present)
+                        n <- length(present)
+                        swarm$centre[atX] <- i + (slot - (n + 1) / 2) * 0.9 / n
+                        band <- min(band, 0.45 / n)
+                    }
+                }
+
+                swarm$xs <- swarm$centre
+                for (centre in unique(swarm$centre)) {
+                    sel <- swarm$centre == centre
+                    swarm$xs[sel] <- centre + swarmOffsets(
+                        swarm$y[sel],
+                        unitsPerPx,
+                        pointSize,
+                        band = band
+                    )
+                }
+
+                ggplot2::geom_point(
+                    data = swarm,
+                    mapping = aes(x = xs, y = y),
+                    inherit.aes = FALSE,
+                    size = pointSize,
+                    alpha = self$options$pointOpacity,
+                    color = theme$color[1]
+                )
+            },
             .getDefaultLabels = function() {
                 if (is.null(self$options$group1) && !is.null(self$options$group2)) {
                     xLabel <- self$options$group2

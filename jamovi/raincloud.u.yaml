@@ -70,10 +70,13 @@ children:
                   - type: CheckBox
                     name: showPoints
                     children:
+                      - type: ComboBox
+                        name: pointLayout
+                        enable: (showPoints)
                       - type: TextBox
                         name: jitterWidth
                         format: number
-                        enable: (showPoints)
+                        enable: (showPoints && pointLayout:jitter)
                       - type: TextBox
                         name: pointSize
                         format: number

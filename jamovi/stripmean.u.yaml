@@ -40,9 +40,12 @@ children:
               - type: Label
                 label: Data Points
                 children:
+                  - type: ComboBox
+                    name: pointLayout
                   - type: TextBox
                     name: jitterWidth
                     format: number
+                    enable: (pointLayout:jitter)
                   - type: TextBox
                     name: pointSize
                     format: number

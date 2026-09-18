@@ -56,6 +56,18 @@ options:
       type: Bool
       default: true
 
+    - name: pointLayout
+      title: Point layout
+      type: List
+      options:
+        - name: jitter
+          title: Random jitter
+        - name: stack
+          title: Stacks
+        - name: swarm
+          title: Beeswarm
+      default: jitter
+
     - name: jitterWidth
       title: Jitter width
       type: Number

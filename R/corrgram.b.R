@@ -11,6 +11,7 @@ corrgramClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
             },
             .run = function() {
                 if (length(self$options$vars) < 2) {
+                    insertMinVarsNotice(self, length(self$options$vars), 2)
                     return()
                 }
 

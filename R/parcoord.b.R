@@ -12,6 +12,7 @@ parcoordClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
             .run = function() {
                 vars <- unlist(self$options$vars)
                 if (length(vars) < 2) {
+                    insertMinVarsNotice(self, length(vars), 2)
                     return()
                 }
 

@@ -129,11 +129,78 @@ raincloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         )
                 }
 
+                leftExtent <- pointShift + 0.25
                 if (self$options$showPoints) {
-                    jw <- self$options$jitterWidth
                     rain <- data
-                    rain$xj <- rain$pos - pointShift +
-                        stats::runif(nrow(rain), -jw, jw)
+                    if (self$options$pointLayout == "stack") {
+                        # dots stacked away from the cloud: bins of equal
+                        # width shared by all groups, each dot drawn at its
+                        # bin centre, so stack lengths are comparable
+                        yRange <- range(rain$y)
+                        if (yRange[2] > yRange[1]) {
+                            binWidth <- (yRange[2] - yRange[1]) / 30
+                            bin <- pmin(floor((rain$y - yRange[1]) / binWidth), 29)
+                            rain$y <- yRange[1] + (bin + 0.5) * binWidth
+                        } else {
+                            bin <- rep(0, nrow(rain))
+                        }
+                        # 0-based rank of each dot within its group and bin
+                        stackIndex <- stats::ave(
+                            seq_len(nrow(rain)),
+                            rain$pos,
+                            bin,
+                            FUN = seq_along
+                        ) - 1
+                        # stacks start left of the box and may use the band
+                        # up to the neighbouring group's cloud
+                        stackBase <- 0.12
+                        if (self$options$showBox) {
+                            stackBase <- max(stackBase, self$options$boxWidth / 2 + 0.06)
+                        }
+                        stackBand <- max(0.15, 0.95 - stackBase - cloudBase - cloudMax)
+                        # step of about one dot diameter (points are sized
+                        # in mm, the axis in group units), shrunk when the
+                        # longest stack would not fit in the band
+                        axisPx <- 0.8 * if (self$options$flipAxes) image$height else image$width
+                        dotPx <- self$options$pointSize / 25.4 * 72
+                        step <- dotPx / (axisPx / (nGroups + 0.5))
+                        step <- min(step, stackBand / max(stackIndex, 1))
+                        rain$xj <- rain$pos - stackBase - stackIndex * step
+                        leftExtent <- max(leftExtent, stackBase + stackBand + 0.05)
+                    } else if (self$options$pointLayout == "swarm") {
+                        # one-sided swarm hanging from the same baseline as
+                        # the stacks
+                        swarmBase <- 0.12
+                        if (self$options$showBox) {
+                            swarmBase <- max(swarmBase, self$options$boxWidth / 2 + 0.06)
+                        }
+                        swarmBand <- max(0.15, 0.95 - swarmBase - cloudBase - cloudMax)
+                        leftExtent <- max(leftExtent, swarmBase + swarmBand + 0.05)
+                        unitsPerPx <- panelUnitsPerPx(
+                            p,
+                            image,
+                            self$options$flipAxes,
+                            xRange = c(1 - leftExtent, nGroups + cloudBase + cloudMax + 0.1),
+                            yRange = if (self$options$yAxisRangeType == "manual") {
+                                c(self$options$yAxisRangeMin, self$options$yAxisRangeMax)
+                            }
+                        )
+                        rain$xj <- rain$pos - swarmBase
+                        for (i in seq_len(nGroups)) {
+                            sel <- rain$pos == i
+                            rain$xj[sel] <- rain$xj[sel] + swarmOffsets(
+                                rain$y[sel],
+                                unitsPerPx,
+                                self$options$pointSize,
+                                side = "down",
+                                band = swarmBand
+                            )
+                        }
+                    } else {
+                        jw <- self$options$jitterWidth
+                        rain$xj <- rain$pos - pointShift +
+                            stats::runif(nrow(rain), -jw, jw)
+                    }
                     if (hasGroup) {
                         p <- p +
                             ggplot2::geom_point(
@@ -160,7 +227,7 @@ raincloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         breaks = seq_len(nGroups),
                         labels = levelsX,
                         limits = c(
-                            1 - pointShift - 0.25,
+                            1 - leftExtent,
                             nGroups + cloudBase + cloudMax + 0.1
                         )
                     ) +

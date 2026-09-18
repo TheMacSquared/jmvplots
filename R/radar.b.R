@@ -12,6 +12,20 @@ radarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
             .run = function() {
                 vars <- unlist(self$options$vars)
                 if (length(vars) < 3) {
+                    insertMinVarsNotice(self, length(vars), 3)
+                    return()
+                }
+
+                if (self$options$scaling == "pctmax" && is.null(self$options$group)) {
+                    # the reference is the largest group mean, so a single
+                    # polygon would sit on the outer ring by construction
+                    notice <- jmvcore::Notice$new(
+                        self$options,
+                        name = ".pctmaxGroup",
+                        type = jmvcore::NoticeType$INFO,
+                        content = .("Scaling by percent of the largest group mean requires a grouping variable.")
+                    )
+                    self$results$insert(1, notice)
                     return()
                 }
 
@@ -44,14 +58,34 @@ radarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 # drop rows with any missing value
                 df <- stats::na.omit(df)
 
-                # min-max normalize each variable to [0, 1] over the whole
-                # data set (not per group); constant variables map to 0.5
-                for (v in vars) {
-                    rng <- range(df[[v]])
-                    if (is.finite(rng[1]) && rng[2] > rng[1]) {
-                        df[[v]] <- (df[[v]] - rng[1]) / (rng[2] - rng[1])
+                # scale each variable to [0, 1] over the whole data set (not
+                # per group); constant variables map to 0.5
+                rescale <- function(x, lo, hi) {
+                    if (is.finite(lo) && hi > lo) {
+                        pmin(pmax((x - lo) / (hi - lo), 0), 1)
                     } else {
-                        df[[v]] <- rep(0.5, nrow(df))
+                        rep(0.5, length(x))
+                    }
+                }
+
+                scaling <- self$options$scaling
+                for (v in vars) {
+                    x <- df[[v]]
+                    if (length(x) == 0) {
+                        next
+                    }
+                    if (scaling == "minmax") {
+                        df[[v]] <- rescale(x, min(x), max(x))
+                    } else if (scaling == "robust") {
+                        # values beyond the 5th / 95th percentile are clipped
+                        q <- stats::quantile(x, c(0.05, 0.95), names = FALSE)
+                        df[[v]] <- rescale(x, q[1], q[2])
+                    } else if (scaling == "percentile") {
+                        # mid-rank percentile: the overall mean is always 0.5
+                        df[[v]] <- (rank(x, ties.method = "average") - 0.5) / length(x)
+                    } else if (min(x) < 0) {
+                        # pctmax keeps raw values (scaled after aggregation)
+                        stop("Skalowanie „procent największej średniej grupowej” wymaga zmiennych bez wartości ujemnych.", call. = FALSE)
                     }
                 }
 
@@ -90,6 +124,13 @@ radarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         by = list(group = df$group),
                         FUN = mean
                     )
+                    if (self$options$scaling == "pctmax") {
+                        # each axis runs from 0 to the largest group mean
+                        for (v in vars) {
+                            top <- max(means[[v]])
+                            means[[v]] <- if (top > 0) means[[v]] / top else 0
+                        }
+                    }
                     poly <- do.call(rbind, lapply(seq_len(nrow(means)), function(i) {
                         data.frame(
                             group = means$group[i],
@@ -206,7 +247,13 @@ radarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 labelDefaults <- list(
                     title = NULL,
-                    caption = .("Axes show min–max normalized values"),
+                    caption = switch(
+                        self$options$scaling,
+                        minmax = .("Axes show min–max normalized values"),
+                        robust = .("Axes: 0% = 5th percentile, 100% = 95th percentile of the observations"),
+                        pctmax = .("Axes: 100% = the largest group mean"),
+                        percentile = .("Axes show mean percentile ranks")
+                    ),
                     xLabel = NULL,
                     yLabel = NULL,
                     groupLabel = self$options$group
