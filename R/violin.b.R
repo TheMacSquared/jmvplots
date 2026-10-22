@@ -10,7 +10,11 @@ violinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 image <- self$results$plot
             },
             .run = function() {
-                if (is.null(self$options$var)) {
+                if (self$options$mode == "wide") {
+                    if (length(self$options$vars) == 0) {
+                        return()
+                    }
+                } else if (is.null(self$options$var)) {
                     return()
                 }
 
@@ -19,6 +23,19 @@ violinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
             #### Plot functions ----
             .preparePlotData = function() {
                 image <- self$results$plot
+
+                if (self$options$mode == "wide") {
+                    # several columns: each column is one category on the x axis
+                    df <- wideToLong(
+                        self$data,
+                        unlist(self$options$vars),
+                        self$options$wideGroup,
+                        listwise = self$options$naOmit
+                    )
+                    insertWideCountsNotice(self, df)
+                    image$setState(df)
+                    return()
+                }
 
                 var <- self$options$var
                 group1 <- self$options$group1
@@ -44,6 +61,7 @@ violinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 image$setState(df)
             },
             .violinPlot = function(image, ggtheme, theme, ...) {
+                g <- private$.groupVars()
                 if (is.null(image$state)) {
                     return(FALSE)
                 }
@@ -65,9 +83,9 @@ violinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         levels(data$group) <- wrapped
                 }
 
-                hasGroup2 <- !is.null(self$options$group1) && !is.null(self$options$group2)
+                hasGroup2 <- !is.null(g$group1) && !is.null(g$group2)
 
-                if (is.null(self$options$group1) && is.null(self$options$group2)) {
+                if (is.null(g$group1) && is.null(g$group2)) {
                     p <- ggplot(data, aes(x = x, y = y)) +
                         ggplot2::geom_violin(
                             trim = self$options$trim,
@@ -76,7 +94,7 @@ violinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             fill = theme$fill[2]
                         ) +
                         ggtheme
-                } else if (is.null(self$options$group1) || is.null(self$options$group2)) {
+                } else if (is.null(g$group1) || is.null(g$group2)) {
                     # single grouping variable: one palette colour per violin,
                     # no legend (the groups are already labelled on the axis)
                     p <- ggplot(data, aes(x = x, y = y, fill = x)) +
@@ -229,22 +247,32 @@ violinClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 )
             },
             .getDefaultLabels = function() {
-                if (is.null(self$options$group1) && !is.null(self$options$group2)) {
-                    xLabel <- self$options$group2
+                g <- private$.groupVars()
+                if (is.null(g$group1) && !is.null(g$group2)) {
+                    xLabel <- g$group2
                     groupLabel <- NULL
-                } else if (!is.null(self$options$group1) && is.null(self$options$group2)) {
-                    xLabel <- self$options$group1
+                } else if (!is.null(g$group1) && is.null(g$group2)) {
+                    xLabel <- g$group1
                     groupLabel <- NULL
                 } else {
-                    xLabel <- self$options$group1
-                    groupLabel <- self$options$group2
+                    xLabel <- g$group1
+                    groupLabel <- g$group2
                 }
 
                 return(list(
                     xLabel = xLabel,
-                    yLabel = self$options$var,
+                    yLabel = if (self$options$mode == "wide") .("Value") else self$options$var,
                     groupLabel = groupLabel
                 ))
+            },
+            # grouping in the plot: in the wide format the columns take the
+            # place of the first grouping variable ("" = no axis title) and
+            # the grouping variable the place of the second
+            .groupVars = function() {
+                if (self$options$mode == "wide") {
+                    return(list(group1 = "", group2 = self$options$wideGroup))
+                }
+                list(group1 = self$options$group1, group2 = self$options$group2)
             }
         ),
         public = list(

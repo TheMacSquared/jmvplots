@@ -10,7 +10,11 @@ raincloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 image <- self$results$plot
             },
             .run = function() {
-                if (is.null(self$options$var)) {
+                if (self$options$mode == "wide") {
+                    if (length(self$options$vars) == 0) {
+                        return()
+                    }
+                } else if (is.null(self$options$var)) {
                     return()
                 }
 
@@ -19,6 +23,14 @@ raincloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
             #### Plot functions ----
             .preparePlotData = function() {
                 image <- self$results$plot
+
+                if (self$options$mode == "wide") {
+                    # several columns: each column is one category on the x axis
+                    df <- wideToLong(self$data, unlist(self$options$vars))
+                    insertWideCountsNotice(self, df)
+                    image$setState(df)
+                    return()
+                }
 
                 var <- self$options$var
                 group <- self$options$group
@@ -244,9 +256,10 @@ raincloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     p <- p + ggplot2::coord_cartesian(ylim = ylims)
                 }
 
+                wide <- self$options$mode == "wide"
                 labelDefaults <- list(
-                    xLabel = self$options$group,
-                    yLabel = self$options$var,
+                    xLabel = if (wide) "" else self$options$group,
+                    yLabel = if (wide) .("Value") else self$options$var,
                     groupLabel = NULL
                 )
                 p <- p +

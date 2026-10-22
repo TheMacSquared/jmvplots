@@ -10,7 +10,11 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 image <- self$results$plot
             },
             .run = function() {
-                if (is.null(self$options$var)) {
+                if (self$options$mode == "wide") {
+                    if (length(self$options$vars) == 0) {
+                        return()
+                    }
+                } else if (is.null(self$options$var)) {
                     return()
                 }
 
@@ -19,6 +23,19 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
             #### Plot functions ----
             .preparePlotData = function() {
                 image <- self$results$plot
+
+                if (self$options$mode == "wide") {
+                    # several columns: each column is one category on the x axis
+                    df <- wideToLong(
+                        self$data,
+                        unlist(self$options$vars),
+                        self$options$wideGroup,
+                        listwise = self$options$naOmit
+                    )
+                    insertWideCountsNotice(self, df)
+                    image$setState(df)
+                    return()
+                }
 
                 var <- self$options$var
                 group1 <- self$options$group1
@@ -44,6 +61,7 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 image$setState(df)
             },
             .boxPlot = function(image, ggtheme, theme, ...) {
+                g <- private$.groupVars()
                 if (is.null(image$state)) {
                     return(FALSE)
                 }
@@ -61,7 +79,7 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 plot_call_list <- private$.getPlotCallList(data, theme)
 
                 theme_call_list_args <- list()
-                if (!is.null(self$options$group1) && !is.null(self$options$group2)) {
+                if (!is.null(g$group1) && !is.null(g$group2)) {
                     theme_call_list_args <- utils::modifyList(
                         theme_call_list_args,
                         getLegendThemeCallArgs(self$options)
@@ -80,6 +98,7 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 return(p)
             },
             .getPlotCallList = function(data, theme) {
+                g <- private$.groupVars()
                 # wrap long legend labels (colours still come from ggtheme)
                 if ("group" %in% colnames(data) && is.factor(data$group)) {
                     wrapped <- jmvcore::wrapLabels(levels(data$group))
@@ -87,8 +106,8 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         levels(data$group) <- wrapped
                 }
 
-                noGroups <- is.null(self$options$group1) && is.null(self$options$group2)
-                bothGroups <- !is.null(self$options$group1) && !is.null(self$options$group2)
+                noGroups <- is.null(g$group1) && is.null(g$group2)
+                bothGroups <- !is.null(g$group1) && !is.null(g$group2)
 
                 if (noGroups) {
                     mapping <- aes(x = x, y = y)
@@ -184,27 +203,42 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
             },
             #### Helper functions ----
             .getDefaultLabels = function() {
-                if (is.null(self$options$group1) && !is.null(self$options$group2)) {
-                    xLabel <- self$options$group2
+                g <- private$.groupVars()
+                if (is.null(g$group1) && !is.null(g$group2)) {
+                    xLabel <- g$group2
                     groupLabel <- NULL
-                } else if (!is.null(self$options$group1) && is.null(self$options$group2)) {
-                    xLabel <- self$options$group1
+                } else if (!is.null(g$group1) && is.null(g$group2)) {
+                    xLabel <- g$group1
                     groupLabel <- NULL
                 } else {
-                    xLabel <- self$options$group1
-                    groupLabel <- self$options$group2
+                    xLabel <- g$group1
+                    groupLabel <- g$group2
                 }
 
                 return(list(
                     xLabel = xLabel,
-                    yLabel = self$options$var,
+                    yLabel = if (self$options$mode == "wide") .("Value") else self$options$var,
                     groupLabel = groupLabel
                 ))
+            },
+            # grouping in the plot: in the wide format the columns take the
+            # place of the first grouping variable ("" = no axis title) and
+            # the grouping variable the place of the second
+            .groupVars = function() {
+                if (self$options$mode == "wide") {
+                    return(list(group1 = "", group2 = self$options$wideGroup))
+                }
+                list(group1 = self$options$group1, group2 = self$options$group2)
             }
         ),
         public = list(
             asSource = function() {
-                if (is.null(self$options$var)) {
+                g <- private$.groupVars()
+                if (self$options$mode == "wide") {
+                    if (length(self$options$vars) == 0) {
+                        return("")
+                    }
+                } else if (is.null(self$options$var)) {
                     return("")
                 }
 
@@ -217,7 +251,7 @@ jmvboxClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     self$options,
                     call_list,
                     data_prep_code,
-                    hasLegend = !is.null(self$options$group1) && !is.null(self$options$group2),
+                    hasLegend = !is.null(g$group1) && !is.null(g$group2),
                     flipAxes = self$options$flipAxes
                 ))
             }

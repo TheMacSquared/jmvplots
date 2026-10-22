@@ -17,6 +17,7 @@ options:
         - continuous
       permitted:
         - numeric
+      default: null
 
     - name: group1
       title: Grouping Variable 1
@@ -29,6 +30,34 @@ options:
 
     - name: group2
       title: Grouping Variable 2
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+      default: null
+
+    - name: mode
+      title: Data format
+      type: List
+      options:
+        - name: long
+          title: One variable
+        - name: wide
+          title: Several variables
+      default: long
+
+    - name: vars
+      title: Variables
+      type: Variables
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default: null
+
+    - name: wideGroup
+      title: Grouping Variable
       type: Variable
       suggested:
         - nominal

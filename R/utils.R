@@ -556,3 +556,61 @@ swarmOffsets <- function(y, unitsPerPx, pointSize, side = "both", band = Inf) {
     offsets
 }
 
+
+#' Wide format (several measurement columns) to the long data the group plots
+#' draw from (jUPWR)
+#'
+#' One row per observation and column: `x` = the column (in the order the
+#' variables were chosen), `y` = its value and, with a grouping variable,
+#' `group`. Missing values are dropped per column, or listwise across all the
+#' columns (and the grouping variable) when `listwise` is TRUE.
+#'
+#' @param data The analysis data
+#' @param vars The measurement columns
+#' @param group Optional grouping variable name
+#' @param listwise Keep only rows complete in every column
+#' @return A data frame with columns x, y and optionally group
+#' @keywords internal
+wideToLong <- function(data, vars, group = NULL, listwise = FALSE) {
+    values <- lapply(data[vars], jmvcore::toNumeric)
+    keep <- rep(TRUE, nrow(data))
+    if (listwise) {
+        keep <- stats::complete.cases(as.data.frame(values))
+        if (!is.null(group)) {
+            keep <- keep & !is.na(data[[group]])
+        }
+    }
+
+    n <- sum(keep)
+    long <- data.frame(
+        x = factor(rep(vars, each = n), levels = vars),
+        y = unlist(lapply(values, function(v) v[keep]), use.names = FALSE)
+    )
+    if (!is.null(group)) {
+        long$group <- factor(rep(data[[group]][keep], length(vars)))
+    }
+    long[!is.na(long$y), , drop = FALSE]
+}
+
+#' Notice with the number of observations per column when the columns of a
+#' wide-format plot have different numbers of values (jUPWR)
+#'
+#' @param self The analysis
+#' @param long The output of wideToLong()
+#' @keywords internal
+insertWideCountsNotice <- function(self, long) {
+    counts <- table(long$x)
+    if (length(unique(as.integer(counts))) <= 1) {
+        return(invisible(NULL))
+    }
+    notice <- jmvcore::Notice$new(
+        self$options,
+        name = ".wideCounts",
+        type = jmvcore::NoticeType$INFO,
+        content = jmvcore::format(
+            .("Observations per variable: {}."),
+            paste(names(counts), as.integer(counts), sep = " ", collapse = ", ")
+        )
+    )
+    self$results$insert(1, notice)
+}

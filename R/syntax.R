@@ -299,6 +299,27 @@ generateDataPrepCode <- function(options, plotType = "bar") {
                 }
             }
         }
+    } else if (plotType == "box" && options$mode == "wide") {
+        # jUPWR: several columns, one category per column (see wideToLong())
+        vars <- unlist(options$vars)
+        group <- asSymbol(options$wideGroup)
+        cols <- paste(vapply(vars, asSymbol, character(1)), collapse = ", ")
+        levelsCode <- paste0("c(", paste(vapply(vars, quoteString, character(1)), collapse = ", "), ")")
+        selectCode <- if (is.null(group)) cols else sprintf("%s, group = %s", cols, group)
+        code <- sprintf(
+            "data |>\n  select(%s) |>\n  mutate(across(c(%s), jmvcore::toNumeric))",
+            selectCode,
+            cols
+        )
+        if (options$naOmit) {
+            code <- paste0(code, " |>\n  filter(if_all(everything(), ~ !is.na(.x)))")
+        }
+        code <- paste0(code, sprintf(
+            " |>\n  tidyr::pivot_longer(c(%s), names_to = 'x', values_to = 'y') |>\n  filter(!is.na(y)) |>\n  mutate(x = factor(x, levels = %s)%s)",
+            cols,
+            levelsCode,
+            if (is.null(group)) "" else ", group = factor(group)"
+        ))
     } else if (plotType == "box") {
         var <- asSymbol(options$var)
         group1 <- asSymbol(options$group1)
