@@ -89,6 +89,12 @@ radarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     }
                 }
 
+                # small multiples need more room: about 400 x 330 px per radar
+                if (!is.null(group) && self$options$facet) {
+                    n <- max(1, nlevels(droplevels(df$group)))
+                    image$setSize(400 * min(n, 3) + 40, 330 * ceiling(n / 3) + 60)
+                }
+
                 image$setState(df)
             },
             .radarPlot = function(image, ggtheme, theme, ...) {
@@ -241,9 +247,18 @@ radarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         size = 3.5
                     ) +
                     ggplot2::coord_fixed(
-                        xlim = c(-1.45, 1.45),
+                        # small panels need more room for the side labels
+                        xlim = if (hasGroup && self$options$facet) c(-2.1, 2.1) else c(-1.45, 1.45),
                         ylim = c(-1.35, 1.35)
                     )
+
+                if (hasGroup && self$options$facet) {
+                    # one radar per group (small multiples); the panel titles
+                    # name the groups, so the legend is dropped
+                    p <- p +
+                        ggplot2::facet_wrap(~group, ncol = min(nlevels(poly$group), 3)) +
+                        ggplot2::guides(fill = "none", color = "none")
+                }
 
                 labelDefaults <- list(
                     title = NULL,

@@ -50,6 +50,9 @@ children:
                   - type: TextBox
                     name: lineWidth
                     format: number
+                  - type: CheckBox
+                    name: facet
+                    enable: (group)
           - type: LayoutBox
             cell:
               column: 1

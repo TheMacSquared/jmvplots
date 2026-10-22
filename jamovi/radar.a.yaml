@@ -60,6 +60,11 @@ options:
       type: Bool
       default: true
 
+    - name: facet
+      title: Separate radar for each group
+      type: Bool
+      default: false
+
     - name: title
       title: Title text
       type: String
