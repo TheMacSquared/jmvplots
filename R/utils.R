@@ -395,6 +395,9 @@ autoscalePlotBreaks <- function(p, width_px, height_px) {
     # 100000), which trips base R's format() into scientific notation for
     # the whole axis. Label explicitly to keep breaks as plain numbers.
     numberLabels <- scales::label_number(big.mark = "")
+    # jUPWR: keep labels a plot sets itself (e.g. percentages on a
+    # proportion axis); only default labels are replaced
+    hasOwnLabels <- function(scale) !inherits(scale$labels, "waiver")
 
     xScaleExplicit <- p$scales$get_scales("x")
     yScaleExplicit <- p$scales$get_scales("y")
@@ -402,7 +405,9 @@ autoscalePlotBreaks <- function(p, width_px, height_px) {
     if (!is.null(xScaleExplicit) && inherits(xScaleExplicit, "ScaleContinuousPosition")) {
         # Mutate in-place to preserve limits, name, etc.
         xScaleExplicit$breaks <- xBreaks
-        xScaleExplicit$labels <- numberLabels
+        if (!hasOwnLabels(xScaleExplicit)) {
+            xScaleExplicit$labels <- numberLabels
+        }
     } else if (is.null(xScaleExplicit)) {
         pb <- ggplot2::ggplot_build(p)
         if (inherits(pb$layout$panel_scales_x[[1]], "ScaleContinuousPosition")) {
@@ -412,7 +417,9 @@ autoscalePlotBreaks <- function(p, width_px, height_px) {
 
     if (!is.null(yScaleExplicit) && inherits(yScaleExplicit, "ScaleContinuousPosition")) {
         yScaleExplicit$breaks <- yBreaks
-        yScaleExplicit$labels <- numberLabels
+        if (!hasOwnLabels(yScaleExplicit)) {
+            yScaleExplicit$labels <- numberLabels
+        }
     } else if (is.null(yScaleExplicit)) {
         pb <- ggplot2::ggplot_build(p)
         if (inherits(pb$layout$panel_scales_y[[1]], "ScaleContinuousPosition")) {
