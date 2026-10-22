@@ -516,13 +516,4 @@ options:
           title: Vertical
       default: vertical
 
-    - name: groupBarType
-      title: Bar type
-      type: List
-      options:
-        - name: grouped
-          title: Grouped
-        - name: stacked
-          title: Stacked
-      default: grouped
 ...

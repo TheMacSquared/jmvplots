@@ -1,6 +1,6 @@
 ---
 name:  stackbar
-title: Stacked Bar Plot
+title: Bar Plot
 category: plots
 menuGroup: Composition
 version: '1.0.0'
@@ -41,10 +41,12 @@ options:
       title: Bar heights
       type: List
       options:
-        - name: percent
-          title: Proportions (100%)
         - name: count
           title: Counts
+        - name: percentDodge
+          title: Proportions
+        - name: percent
+          title: Proportions, stacked (100%)
       default: percent
 
     - name: barWidth

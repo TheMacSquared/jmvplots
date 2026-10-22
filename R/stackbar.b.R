@@ -53,7 +53,7 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 data <- image$state
                 if (nrow(data) == 0) {
-                    stop("Brak obserwacji dla skumulowanego wykresu słupkowego.", call. = FALSE)
+                    stop("Brak obserwacji dla wykresu słupkowego.", call. = FALSE)
                 }
 
                 # wrap long legend labels (colours still come from ggtheme)
@@ -62,18 +62,51 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     levels(data$segments) <- wrapped
                 }
 
-                isPercent <- self$options$barType == "percent"
-                position <- if (isPercent) "fill" else "stack"
-                outsideLabels <- isPercent &&
+                barType <- self$options$barType
+                isStacked <- barType == "percent"
+                isPercent <- barType != "count"
+                outsideLabels <- isStacked &&
                     self$options$percentLabels &&
                     self$options$percentLabelsPosition == "outside"
 
-                p <- ggplot(data, aes(x = x, fill = segments, weight = w)) +
-                    ggplot2::geom_bar(
-                        position = position,
-                        width = self$options$barWidth,
-                        color = theme$color[1]
+                if (isStacked) {
+                    p <- ggplot(data, aes(x = x, fill = segments, weight = w)) +
+                        ggplot2::geom_bar(
+                            position = "fill",
+                            width = self$options$barWidth,
+                            color = theme$color[1]
+                        )
+                } else {
+                    # side by side: counts, or shares of the segments within
+                    # each x category (every x sums to 100%); empty
+                    # combinations are kept as zero-height bars
+                    barData <- as.data.frame(
+                        stats::xtabs(w ~ x + segments, data = data),
+                        responseName = "n"
                     )
+                    barData <- barData |>
+                        dplyr::group_by(x) |>
+                        dplyr::mutate(prop = if (sum(n) > 0) n / sum(n) else 0) |>
+                        dplyr::ungroup()
+                    barData$y <- if (isPercent) barData$prop else barData$n
+                    dodge <- ggplot2::position_dodge(width = self$options$barWidth)
+
+                    p <- ggplot(barData, aes(x = x, y = y, fill = segments)) +
+                        ggplot2::geom_col(
+                            position = dodge,
+                            width = self$options$barWidth * 0.9,
+                            color = theme$color[1]
+                        )
+
+                    if (isPercent && self$options$percentLabels) {
+                        p <- p + ggplot2::geom_text(
+                            mapping = aes(label = scales::percent(prop, accuracy = 1)),
+                            position = dodge,
+                            vjust = if (self$options$flipAxes) 0.5 else -0.4,
+                            hjust = if (self$options$flipAxes) -0.15 else 0.5
+                        )
+                    }
+                }
 
                 if (outsideLabels && !self$options$flipAxes) {
                     # extra room on the right so outside labels are not clipped
@@ -85,7 +118,7 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     p <- p + ggplot2::scale_x_discrete(labels = jmvcore::wrapLabels)
                 }
 
-                if (isPercent && self$options$percentLabels) {
+                if (isStacked && self$options$percentLabels) {
                     # per-bar proportions (weights taken into account)
                     labelData <- data |>
                         dplyr::group_by(x, segments) |>

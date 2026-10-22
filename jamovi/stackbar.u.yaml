@@ -1,4 +1,4 @@
-title: Stacked Bar Plot
+title: Bar Plot
 name: stackbar
 jus: '3.0'
 stage: 0
@@ -48,13 +48,17 @@ children:
                 label: Bar heights
                 children:
                   - type: RadioButton
-                    name: barType_percent
-                    optionName: barType
-                    optionPart: percent
-                  - type: RadioButton
                     name: barType_count
                     optionName: barType
                     optionPart: count
+                  - type: RadioButton
+                    name: barType_percentDodge
+                    optionName: barType
+                    optionPart: percentDodge
+                  - type: RadioButton
+                    name: barType_percent
+                    optionName: barType
+                    optionPart: percent
               - type: Label
                 label: Bar
                 children:
@@ -63,11 +67,11 @@ children:
                     format: number
                   - type: CheckBox
                     name: percentLabels
-                    enable: (barType:percent)
+                    enable: (barType:percent || barType:percentDodge)
                     children:
                       - type: ComboBox
                         name: percentLabelsPosition
-                        enable: (percentLabels)
+                        enable: (percentLabels && barType:percent)
           - type: LayoutBox
             cell:
               column: 1

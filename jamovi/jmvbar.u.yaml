@@ -180,38 +180,6 @@ children:
                   - type: CheckBox
                     name: naOmit
   - type: CollapseBox
-    label: Group Options
-    collapsed: true
-    stretchFactor: 1
-    children:
-      - type: LayoutBox
-        margin: large
-        stretchFactor: 1
-        children:
-          - type: LayoutBox
-            cell:
-              column: 0
-              row: 0
-            stretchFactor: 1
-            children:
-              - type: Label
-                label: Bar Type
-                children:
-                  - type: RadioButton
-                    name: groupBarType_grouped
-                    optionName: groupBarType
-                    optionPart: grouped
-                  - type: RadioButton
-                    name: groupBarType_stacked
-                    optionName: groupBarType
-                    optionPart: stacked
-          - type: LayoutBox
-            cell:
-              column: 1
-              row: 0
-            stretchFactor: 1
-            children: []
-  - type: CollapseBox
     label: Plot & Axis Titles
     collapsed: true
     stretchFactor: 1

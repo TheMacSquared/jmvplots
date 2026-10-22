@@ -353,9 +353,7 @@ jmvbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 mode <- self$options$mode
                 if (mode == "continuous") {
                     errorBars <- self$options$errorBars
-                    hasErrorBars <- errorBars != "none" &&
-                        (!self$grouped ||
-                            (self$grouped && self$options$groupBarType == "grouped"))
+                    hasErrorBars <- errorBars != "none"
                     return(hasErrorBars)
                 }
 
@@ -387,16 +385,12 @@ jmvbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     args$width <- self$options$barWidth
                     args$fill <- theme$fill[2]
                 } else {
-                    if (self$options$groupBarType == "grouped") {
-                        position <- ggplot2::position_dodge(
-                            width = self$options$barWidth
-                        )
-
-                        args$width <- self$options$barWidth * 0.9
-                        args$position <- position
-                    } else {
-                        args$width <- self$options$barWidth
-                    }
+                    # jUPWR: groups side by side only (stacking removed;
+                    # stacked shares are in stackbar)
+                    args$width <- self$options$barWidth * 0.9
+                    args$position <- ggplot2::position_dodge(
+                        width = self$options$barWidth
+                    )
                 }
 
                 return(list(fun = ggplot2::geom_bar, args = args))
@@ -439,21 +433,15 @@ jmvbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 args <- list(mapping = aes(label = round(y, 2)), size = 5)
 
                 if (self$grouped) {
-                    if (self$options$groupBarType == "grouped") {
-                        args$position <- ggplot2::position_dodge(
-                            width = self$options$barWidth
-                        )
-                    } else {
-                        args$position <- ggplot2::position_stack(vjust = 0.5)
-                    }
+                    args$position <- ggplot2::position_dodge(
+                        width = self$options$barWidth
+                    )
                 }
 
-                if (!self$grouped || (self$grouped && self$options$groupBarType == "grouped")) {
-                    if (self$options$flipAxes) {
-                        args$hjust <- -0.5
-                    } else {
-                        args$vjust <- -0.5
-                    }
+                if (self$options$flipAxes) {
+                    args$hjust <- -0.5
+                } else {
+                    args$vjust <- -0.5
                 }
 
                 return(list(fun = ggplot2::geom_text, args = args))
