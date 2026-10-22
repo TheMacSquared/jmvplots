@@ -11,4 +11,5 @@ items:
       width: 550
       height: 500
       renderFun: .hexbinPlot
+      refs: [ggplot2, hexbin]
 ...

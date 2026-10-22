@@ -1,0 +1,25 @@
+---
+refs:
+    ggplot2:
+        type: 'software'
+        author: Wickham, H., Chang, W., Henry, L., Pedersen, T. L., Takahashi, K., Wilke, C., Woo, K., Yutani, H., Dunnington, D. i van den Brand, T.
+        year: 2026
+        title: 'ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics'
+        publisher: '(wersja 4.0.3) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=ggplot2'
+        url: https://CRAN.R-project.org/package=ggplot2
+
+    ggridges:
+        type: 'software'
+        author: Wilke, C. O.
+        year: 2025
+        title: 'ggridges: Ridgeline Plots in ''ggplot2'''
+        publisher: '(wersja 0.5.7) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=ggridges'
+        url: https://CRAN.R-project.org/package=ggridges
+
+    hexbin:
+        type: 'software'
+        author: Carr, D., Lewin-Koh, N., Maechler, M. i Sarkar, D.
+        year: 2026
+        title: 'hexbin: Hexagonal Binning Routines'
+        publisher: '(wersja 1.28.6) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=hexbin'
+        url: https://CRAN.R-project.org/package=hexbin

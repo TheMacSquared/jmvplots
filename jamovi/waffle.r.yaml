@@ -11,4 +11,5 @@ items:
       width: 500
       height: 500
       renderFun: .wafflePlot
+      refs: ggplot2
 ...

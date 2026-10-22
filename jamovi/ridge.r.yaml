@@ -11,4 +11,5 @@ items:
       width: 550
       height: 500
       renderFun: .ridgePlot
+      refs: [ggplot2, ggridges]
 ...

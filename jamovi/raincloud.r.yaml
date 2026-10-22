@@ -11,5 +11,6 @@ items:
       width: 500
       height: 500
       renderFun: .raincloudPlot
+      refs: ggplot2
 
 ...
