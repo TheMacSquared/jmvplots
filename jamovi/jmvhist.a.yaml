@@ -53,6 +53,15 @@ options:
       default: 0.5
       min: 0
 
+    - name: binStart
+      title: Bin start
+      type: Number
+      default: 0
+      description:
+          R: >
+            a number (default: 0), a boundary of the bins in manual mode;
+            bins are left-closed intervals [a, a + width)
+
     - name: binOpacity
       title: Bin opacity
       type: Number

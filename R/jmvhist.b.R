@@ -38,13 +38,9 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     return(FALSE)
                 }
 
-                if (self$options$binWidthType == "manual") {
-                    binWidth <- self$options$binWidth
-                } else {
-                    binWidth <- private$.calculateBinWidth(image$state$y)
-                }
+                bin <- private$.binSpec(image$state$y)
 
-                plot_call_list <- private$.getPlotCallList(image$state, theme, binWidth)
+                plot_call_list <- private$.getPlotCallList(image$state, theme, bin$width, bin$boundary)
 
                 theme_call_list_args <- list()
                 if (!is.null(self$options$group)) {
@@ -65,7 +61,7 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 p <- autoscalePlotBreaks(p, image$width, image$height)
                 return(p)
             },
-            .getPlotCallList = function(data, theme, binWidth) {
+            .getPlotCallList = function(data, theme, binWidth, binBoundary) {
                 group <- self$options$group
 
                 # wrap long legend labels (colours still come from ggtheme)
@@ -94,6 +90,8 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             fun = ggplot2::geom_histogram,
                             args = list(
                                 binwidth = binWidth,
+                                boundary = binBoundary,
+                                closed = "left",
                                 color = theme$color[1],
                                 fill = theme$fill[2],
                                 alpha = self$options$binOpacity
@@ -106,6 +104,8 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             fun = ggplot2::geom_freqpoly,
                             args = list(
                                 binwidth = binWidth,
+                                boundary = binBoundary,
+                                closed = "left",
                                 color = theme$color[1],
                                 fill = theme$fill[2],
                                 linewidth = self$options$lineSize
@@ -132,6 +132,8 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             args = list(
                                 position = "identity",
                                 binwidth = binWidth,
+                                boundary = binBoundary,
+                                closed = "left",
                                 color = theme$color[1],
                                 alpha = self$options$binOpacity
                             )
@@ -144,6 +146,8 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                             args = list(
                                 position = "identity",
                                 binwidth = binWidth,
+                                boundary = binBoundary,
+                                closed = "left",
                                 linewidth = self$options$lineSize
                             )
                         )
@@ -204,6 +208,25 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 return(plot_call_list)
             },
+            # Bin width and boundary. Bins are left-closed [a, a + width); auto mode
+            # rounds the Freedman-Diaconis width to 1, 2, 2.5 or 5 x 10^k with
+            # boundaries on its multiples (e.g. 0-50, 50-100), manual mode uses the
+            # given width and start.
+            .binSpec = function(x) {
+                if (self$options$binWidthType == "manual") {
+                    return(list(width = self$options$binWidth, boundary = self$options$binStart))
+                }
+                list(width = private$.niceWidth(private$.calculateBinWidth(x)), boundary = 0)
+            },
+            # Rounds a width to the nearest (on the log scale) of 1, 2, 2.5, 5, 10 x 10^k
+            .niceWidth = function(h) {
+                if (!is.finite(h) || h <= 0) {
+                    return(1)
+                }
+                mag <- 10^floor(log10(h))
+                steps <- c(1, 2, 2.5, 5, 10)
+                steps[which.min(abs(log(h / mag) - log(steps)))] * mag
+            },
             # Calculates an optimal histogram bin width using the Freedman-Diaconis rule.
             # Provides a robust fallback to Scott's rule if the Interquartile Range (IQR) is zero.
             #
@@ -247,17 +270,13 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 data_prep_code <- generateDataPrepCode(self$options, "hist")
 
                 var <- self$options$var
-                y_vals <- jmvcore::toNumeric(self$data[[var]])
-                if (self$options$binWidthType == "manual") {
-                    binWidth <- self$options$binWidth
-                } else {
-                    binWidth <- private$.calculateBinWidth(y_vals)
-                }
+                bin <- private$.binSpec(jmvcore::toNumeric(self$data[[var]]))
 
                 call_list <- private$.getPlotCallList(
                     data = self$data,
                     theme = getSyntaxThemeColors(self$options$theme, self$options$palette),
-                    binWidth = binWidth
+                    binWidth = bin$width,
+                    binBoundary = bin$boundary
                 )
                 return(finalizePlotSyntax(
                     self$options,

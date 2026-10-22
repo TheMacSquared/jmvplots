@@ -151,3 +151,30 @@ testthat::test_that("jmvhist syntax: no error when required variables are missin
     testthat::expect_no_error(syntax <- analysis$asSource())
     testthat::expect_identical(syntax, "")
 })
+
+testthat::test_that("jmvhist: auto bins are left-closed with a nice width on its multiples", {
+    # GIVEN a skewed variable whose Freedman-Diaconis width is not round
+    res <- scatr::jmvhist(data = ToothGrowth, var = "len")
+
+    # WHEN the plot is built
+    bins <- ggplot2::layer_data(jamoviGgplot(res, ".histPlot"), 1)
+    width <- unique(round(bins$xmax - bins$xmin, 8))
+
+    # THEN the width is 1, 2, 2.5 or 5 x 10^k and boundaries are its multiples
+    testthat::expect_length(width, 1)
+    testthat::expect_true((width / 10^floor(log10(width))) %in% c(1, 2, 2.5, 5))
+    testthat::expect_equal(bins$xmin %% width, rep(0, nrow(bins)), tolerance = 1e-8)
+})
+
+testthat::test_that("jmvhist: manual bins start at the given boundary", {
+    # GIVEN a manual width and start
+    df <- data.frame(y = c(0, 49, 50, 99, 120))
+    res <- scatr::jmvhist(data = df, var = "y", binWidthType = "manual", binWidth = 50, binStart = 0)
+
+    # WHEN the plot is built
+    bins <- ggplot2::layer_data(jamoviGgplot(res, ".histPlot"), 1)
+
+    # THEN bins are [0, 50), [50, 100), [100, 150] and 50 falls into the second
+    testthat::expect_equal(bins$xmin, c(0, 50, 100))
+    testthat::expect_equal(bins$count, c(2, 2, 1))
+})

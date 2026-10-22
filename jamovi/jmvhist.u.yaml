@@ -53,6 +53,10 @@ children:
                         name: binWidth
                         format: number
                         enable: (binWidthType:manual)
+                      - type: TextBox
+                        name: binStart
+                        format: number
+                        enable: (binWidthType:manual)
               - type: Label
                 label: Histogram
                 children:
