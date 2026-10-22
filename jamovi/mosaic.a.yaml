@@ -2,7 +2,7 @@
 name:  mosaic
 title: Mosaic Plot
 category: plots
-menuGroup: Correlation
+menuGroup: Composition
 version: '1.0.0'
 jas: '1.2'
 

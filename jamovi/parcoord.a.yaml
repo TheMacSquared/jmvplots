@@ -2,7 +2,7 @@
 name:  parcoord
 title: Parallel Coordinates Plot
 category: plots
-menuGroup: Ranking
+menuGroup: Profiles
 version: '1.0.0'
 jas: '1.2'
 
