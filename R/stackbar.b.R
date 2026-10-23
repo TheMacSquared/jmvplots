@@ -10,7 +10,7 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 image <- self$results$plot
             },
             .run = function() {
-                if (is.null(self$options$x) || is.null(self$options$segments)) {
+                if (is.null(self$options$x)) {
                     return()
                 }
 
@@ -21,7 +21,12 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 image <- self$results$plot
 
                 x <- self$options$x
+                # without a segments variable the X categories are the segments:
+                # stacked = one bar split by X, otherwise one bar per X category
                 segments <- self$options$segments
+                if (is.null(segments)) {
+                    segments <- x
+                }
                 counts <- self$options$counts
 
                 if (is.null(counts)) {
@@ -44,6 +49,10 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     dplyr::filter(!is.na(x), !is.na(segments)) |>
                     dplyr::mutate(x = factor(x), segments = factor(segments))
 
+                if (is.null(self$options$segments) && self$options$barType == "percent") {
+                    df$x <- factor("")
+                }
+
                 image$setState(df)
             },
             .stackbarPlot = function(image, ggtheme, theme, ...) {
@@ -62,6 +71,7 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     levels(data$segments) <- wrapped
                 }
 
+                noSegments <- is.null(self$options$segments)
                 barType <- self$options$barType
                 isStacked <- barType == "percent"
                 isPercent <- barType != "count"
@@ -79,15 +89,25 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 } else {
                     # side by side: counts, or shares of the segments within
                     # each x category (every x sums to 100%); empty
-                    # combinations are kept as zero-height bars
-                    barData <- as.data.frame(
-                        stats::xtabs(w ~ x + segments, data = data),
-                        responseName = "n"
-                    )
-                    barData <- barData |>
-                        dplyr::group_by(x) |>
-                        dplyr::mutate(prop = if (sum(n) > 0) n / sum(n) else 0) |>
-                        dplyr::ungroup()
+                    # combinations are kept as zero-height bars; without
+                    # segments: one bar per x, shares of the total
+                    if (noSegments) {
+                        barData <- as.data.frame(
+                            stats::xtabs(w ~ x, data = data),
+                            responseName = "n"
+                        )
+                        barData$segments <- barData$x
+                        barData$prop <- if (sum(barData$n) > 0) barData$n / sum(barData$n) else 0
+                    } else {
+                        barData <- as.data.frame(
+                            stats::xtabs(w ~ x + segments, data = data),
+                            responseName = "n"
+                        )
+                        barData <- barData |>
+                            dplyr::group_by(x) |>
+                            dplyr::mutate(prop = if (sum(n) > 0) n / sum(n) else 0) |>
+                            dplyr::ungroup()
+                    }
                     barData$y <- if (isPercent) barData$prop else barData$n
                     dodge <- ggplot2::position_dodge(width = self$options$barWidth)
 
@@ -173,6 +193,10 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 }
 
                 p <- p + ggtheme + formatLegend(self$options)
+                if (noSegments && !isStacked) {
+                    # colours repeat the x axis, the legend would be redundant
+                    p <- p + ggplot2::theme(legend.position = "none")
+                }
 
                 ylims <- NULL
                 if (self$options$yAxisRangeType == "manual") {
@@ -197,9 +221,9 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 }
 
                 labelDefaults <- list(
-                    xLabel = self$options$x,
+                    xLabel = if (noSegments && isStacked) "" else self$options$x,
                     yLabel = yLabelDefault,
-                    groupLabel = self$options$segments
+                    groupLabel = if (noSegments) self$options$x else self$options$segments
                 )
                 p <- p +
                     setLabels(options = self$options, defaults = labelDefaults) +
