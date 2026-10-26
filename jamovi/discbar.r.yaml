@@ -1,0 +1,16 @@
+---
+name:  discbar
+title: Discrete Bar Plot
+jrs:   '1.1'
+
+items:
+    - name: plot
+      title: ''
+      type: Image
+      description: an image containing the bar plot of a discrete variable
+      width: 500
+      height: 500
+      renderFun: .discbarPlot
+      refs: ggplot2
+
+...

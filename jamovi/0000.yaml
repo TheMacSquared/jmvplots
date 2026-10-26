@@ -1,7 +1,7 @@
 ---
 title: Plots bundled with jamovi
 name: scatr
-version: 2.9.10
+version: 2.9.11
 jms: '1.0'
 authors:
   - Ravi Selker
@@ -30,6 +30,12 @@ analyses:
     ns: scatr
     menuGroup: .
     menuTitle: Histogram
+    category: plots
+  - title: Discrete Bar Plot
+    name: discbar
+    ns: scatr
+    menuGroup: Distribution
+    menuTitle: Discrete Bar Plot
     category: plots
   - title: Scatter Plot
     name: scat

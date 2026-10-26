@@ -17,7 +17,7 @@ options:
           title: Continuous
         - name: counts
           title: Counts
-      default: categorical
+      default: continuous
 
     - name: data
       type: Data

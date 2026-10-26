@@ -7,6 +7,13 @@ children:
   - type: ModeSelector
     name: mode
     stretchFactor: 1
+    # jUPWR: categorical mode hidden (counts of one categorical variable are
+    # in the stacked bar plot); its content stays for older .omv files
+    options:
+      - name: continuous
+        title: Continuous
+      - name: counts
+        title: Counts
     children:
       - type: Content
         name: categorical
