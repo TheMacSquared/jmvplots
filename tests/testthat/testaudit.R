@@ -42,3 +42,31 @@ testthat::test_that("bubble: non-positive sizes are left out with a notice", {
     names <- vapply(res$items, function(i) i$name, "")
     testthat::expect_true(".nonPositiveSize" %in% names)
 })
+
+testthat::test_that("swarm: same layout as the old algorithm, fast for big groups", {
+    off <- scatr:::swarmOffsets(rnorm(10000), list(x = 0.01, y = 0.05), 2)
+    testthat::expect_length(off, 10000)
+    t0 <- proc.time()[["elapsed"]]
+    scatr:::swarmOffsets(rnorm(10000), list(x = 0.01, y = 0.05), 2)
+    testthat::expect_lt(proc.time()[["elapsed"]] - t0, 5)
+    # no two points overlap
+    set.seed(2); y <- round(rnorm(300, 10, 1), 1); u <- list(x = 0.01, y = 0.05)
+    o <- scatr:::swarmOffsets(y, u, 2)
+    D <- as.matrix(stats::dist(cbind(o / u$x, y / u$y))); diag(D) <- Inf
+    testthat::expect_gte(min(D), 2 * 72.27 / 25.4 + 1.5 - 1e-6)
+})
+
+testthat::test_that("histogram: an outlier does not make a million bins", {
+    set.seed(1)
+    res <- scatr::jmvhist(data = data.frame(y = c(rnorm(5000, 50, 1), 999999)), var = "y")
+    b <- ggplot2::ggplot_build(auditGgplot(res, ".histPlot"))
+    testthat::expect_lte(nrow(b$data[[1]]), 200)
+    testthat::expect_true(".widerBins" %in% vapply(res$items, function(i) i$name, ""))
+})
+
+testthat::test_that("discbar: a code-like range is refused with a message", {
+    testthat::expect_error(
+        scatr::discbar(data = data.frame(k = c(1, 2, 3, 999999)), var = "k"),
+        "zbyt szeroki zakres"
+    )
+})

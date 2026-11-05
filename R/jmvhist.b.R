@@ -31,6 +31,18 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         dplyr::mutate(y = jmvcore::toNumeric(y), group = factor(group))
                 }
 
+                if (private$.binsWidened(df$y)) {
+                    self$results$insert(1, jmvcore::Notice$new(
+                        self$options,
+                        name = ".widerBins",
+                        type = jmvcore::NoticeType$INFO,
+                        content = sprintf(
+                            "Słupki poszerzone do najwyżej %d: wartości odstające dawały zbyt wiele wąskich słupków. Szerokość można ustawić ręcznie.",
+                            private$.maxBins
+                        )
+                    ))
+                }
+
                 image$setState(df)
             },
             .histPlot = function(image, ggtheme, theme, ...) {
@@ -216,7 +228,33 @@ jmvhistClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 if (self$options$binWidthType == "manual") {
                     return(list(width = self$options$binWidth, boundary = self$options$binStart))
                 }
-                list(width = private$.niceWidth(private$.calculateBinWidth(x)), boundary = 0)
+                w <- private$.niceWidth(private$.calculateBinWidth(x))
+                # jUPWR: one outlier makes Freedman-Diaconis bins tiny next to
+                # the range (up to a million bins: an empty plot or ~10 s);
+                # the automatic width is widened to at most .maxBins bins
+                rng <- diff(range(x, na.rm = TRUE))
+                if (is.finite(rng) && rng / w > private$.maxBins) {
+                    w <- private$.niceWidthUp(rng / private$.maxBins)
+                }
+                list(width = w, boundary = 0)
+            },
+            .maxBins = 200,
+            # the smallest of 1, 2, 2.5, 5, 10 x 10^k that is >= h
+            .niceWidthUp = function(h) {
+                mag <- 10^floor(log10(h))
+                steps <- c(1, 2, 2.5, 5, 10) * mag
+                steps[which(steps >= h * (1 - 1e-12))[1]]
+            },
+            .binsWidened = function(x) {
+                if (self$options$binWidthType == "manual") {
+                    return(FALSE)
+                }
+                x <- x[!is.na(x)]
+                if (length(x) < 2) {
+                    return(FALSE)
+                }
+                w <- private$.niceWidth(private$.calculateBinWidth(x))
+                diff(range(x)) / w > private$.maxBins
             },
             # Rounds a width to the nearest (on the log scale) of 1, 2, 2.5, 5, 10 x 10^k
             .niceWidth = function(h) {

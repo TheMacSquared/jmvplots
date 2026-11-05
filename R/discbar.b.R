@@ -43,6 +43,17 @@ discbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     )
                 }
                 x <- round(x)
+                # jUPWR: a code-like variable (an ID, a 999999 outlier, a PESEL)
+                # would need millions of bars and gigabytes of memory
+                if (max(x) - min(x) > 500) {
+                    stop(
+                        sprintf(
+                            "Zmienna „%s” ma zbyt szeroki zakres wartości (od %s do %s) na słupek dla każdej wartości; użyj histogramu.",
+                            var, format(min(x), scientific = FALSE), format(max(x), scientific = FALSE)
+                        ),
+                        call. = FALSE
+                    )
+                }
 
                 # every integer between the minimum and the maximum, so values
                 # absent from the data get a zero-height bar

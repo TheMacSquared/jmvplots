@@ -521,28 +521,59 @@ swarmOffsets <- function(y, unitsPerPx, pointSize, side = "both", band = Inf) {
     d <- pointSize * 72.27 / 25.4 + 1.5
     yPx <- y / unitsPerPx$y
 
+    # Points are placed in increasing y, so the placed points within one
+    # diameter in y form a moving window (no scan of all placed points). The
+    # occupied horizontal intervals of those neighbours are merged; the free
+    # position nearest 0 is 0 or an end of the merged interval holding 0 --
+    # the same choice as testing every interval end, without the quadratic
+    # check (10 000 points in a group took 18 s, 20 000 about 2 min)
     offsets <- numeric(n)
     ord <- order(yPx)
-    placed <- integer(0)
-    for (i in ord) {
-        near <- placed[abs(yPx[placed] - yPx[i]) < d]
+    first <- 1L
+    eps <- 1e-9
+    for (k in seq_len(n)) {
+        i <- ord[k]
+        while (first < k && yPx[ord[first]] <= yPx[i] - d) {
+            first <- first + 1L
+        }
         best <- 0
+        if (first < k) {
+            near <- ord[first:(k - 1L)]
+            near <- near[abs(yPx[near] - yPx[i]) < d]
+        } else {
+            near <- integer(0)
+        }
         if (length(near) > 0) {
             reach <- sqrt(d^2 - (yPx[near] - yPx[i])^2)
             lo <- offsets[near] - reach
             hi <- offsets[near] + reach
+            # the same candidates in the same order as checking every
+            # interval (0, the lower ends, the upper ends), so ties go the
+            # same way; whether a candidate is free is looked up in the
+            # merged intervals instead of against every interval
             candidates <- c(0, lo, hi)
             if (side == "down") {
                 candidates <- candidates[candidates >= 0]
             }
-            free <- vapply(candidates, function(cand) {
-                !any(cand > lo + 1e-9 & cand < hi - 1e-9)
-            }, logical(1))
-            candidates <- candidates[free]
+            # merge sorted intervals (vectorised): a new group starts where
+            # an interval does not overlap the running maximum of the ends
+            o <- order(lo)
+            slo <- lo[o]
+            shi <- hi[o]
+            reachMax <- cummax(shi)
+            start <- c(TRUE, slo[-1] >= reachMax[-length(reachMax)] - eps)
+            grp <- cumsum(start)
+            mlo <- slo[start]
+            mhi <- vapply(split(shi, grp), max, numeric(1), USE.NAMES = FALSE)
+            # free = not strictly inside a merged interval (intervals are
+            # merged only when they overlap by more than eps, so its inside
+            # is occupied)
+            g <- findInterval(candidates, mlo)
+            inner <- g > 0 & candidates > mlo[pmax(g, 1)] + eps & candidates < mhi[pmax(g, 1)] - eps
+            candidates <- candidates[!inner]
             best <- candidates[which.min(abs(candidates))]
         }
         offsets[i] <- best
-        placed <- c(placed, i)
     }
 
     offsets <- offsets * unitsPerPx$x
