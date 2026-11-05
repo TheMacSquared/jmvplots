@@ -26,7 +26,8 @@ raincloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 if (self$options$mode == "wide") {
                     # several columns: each column is one category on the x axis
-                    df <- wideToLong(self$data, unlist(self$options$vars))
+                    # "exclude cases listwise": only rows complete in every column
+                    df <- wideToLong(self$data, unlist(self$options$vars), listwise = self$options$naOmit)
                     insertWideCountsNotice(self, df)
                     image$setState(df)
                     return()
@@ -60,7 +61,9 @@ raincloudClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     data <- data |>
                         dplyr::filter(!is.na(x) & !is.na(y))
                 }
-                data <- data |> dplyr::filter(!is.na(y))
+                # a missing group has no place on the axis: as.integer(x) would
+                # be NA and the cloud of a group picked up those rows
+                data <- data |> dplyr::filter(!is.na(y) & !is.na(x))
                 if (nrow(data) == 0) {
                     stop("Brak obserwacji bez braków danych dla wykresu deszczowego.", call. = FALSE)
                 }

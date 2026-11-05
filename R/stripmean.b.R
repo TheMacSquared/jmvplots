@@ -26,7 +26,8 @@ stripmeanClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 if (self$options$mode == "wide") {
                     # several columns: each column is one category on the x axis
-                    df <- wideToLong(self$data, unlist(self$options$vars))
+                    # "exclude cases listwise": only rows complete in every column
+                    df <- wideToLong(self$data, unlist(self$options$vars), listwise = self$options$naOmit)
                     insertWideCountsNotice(self, df)
                     image$setState(df)
                     return()
@@ -73,6 +74,9 @@ stripmeanClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     unitsPerPx <- panelUnitsPerPx(p, image, self$options$flipAxes, yRange = ylims)
 
                     swarm <- data[!is.na(data$y) & !is.na(data$x), ]
+                    # the axis drops empty categories (e.g. an all-missing
+                    # column), so the positions must not count them
+                    swarm$x <- droplevels(swarm$x)
                     nLevels <- nlevels(swarm$x)
                     swarm$pos <- as.integer(swarm$x)
                     if (self$options$xAxisLabelFontSizeRevLabels) {

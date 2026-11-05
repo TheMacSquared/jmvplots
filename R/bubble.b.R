@@ -52,6 +52,22 @@ bubbleClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         )
                 }
 
+                # a bubble's area stands for the value, so only positive sizes
+                # can be drawn (a negative one used to look like its absolute value)
+                bad <- !is.na(df$size) & df$size <= 0
+                if (any(bad)) {
+                    df <- df[!bad, , drop = FALSE]
+                    self$results$insert(1, jmvcore::Notice$new(
+                        self$options,
+                        name = ".nonPositiveSize",
+                        type = jmvcore::NoticeType$INFO,
+                        content = sprintf(
+                            "Pominięto punkty z wielkością ≤ 0 (%d): pole koła przedstawia wartość, więc musi ona być dodatnia.",
+                            sum(bad)
+                        )
+                    ))
+                }
+
                 image$setState(df)
             },
             .bubblePlot = function(image, ggtheme, theme, ...) {
