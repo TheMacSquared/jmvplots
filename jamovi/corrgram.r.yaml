@@ -7,6 +7,7 @@ items:
     - name: plot
       title: ''
       type: Image
+      mode: vector
       description: an image containing the correlogram
       width: 500
       height: 500

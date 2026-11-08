@@ -53,7 +53,7 @@ heatmapClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                         ) |>
                         dplyr::group_by(x, y) |>
                         dplyr::summarise(
-                            value = aggFun(value, na.rm = TRUE),
+                            value = if (all(is.na(value))) NA_real_ else aggFun(value, na.rm = TRUE),
                             .groups = "drop"
                         )
                 }

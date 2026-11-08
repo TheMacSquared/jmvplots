@@ -8,6 +8,16 @@ auditGgplot <- function(res, renderFun) {
     priv[[renderFun]](res$plot, gt$ggtheme, gt$theme)
 }
 
+testthat::test_that("heatmap distinguishes missing cells from a zero sum", {
+    d <- data.frame(x = c("a", "a", "b", "b"), y = "row", v = c(NA, NA, -1, 1))
+    for (aggregation in c("sum", "mean", "median")) {
+        res <- scatr::heatmap(data = d, x = "x", y = "y", value = "v", aggregation = aggregation)
+        st <- res$plot$state
+        testthat::expect_true(is.na(st$value[st$x == "a"]))
+        testthat::expect_equal(st$value[st$x == "b"], 0)
+    }
+})
+
 testthat::test_that("raincloud: a missing group value does not break the plot", {
     d <- data.frame(y = c(1, 2, 3, 4, 5, 6, 7, 8), g = c("a", "a", "a", NA, "b", "b", "b", "b"))
     res <- scatr::raincloud(data = d, var = "y", group = "g")
