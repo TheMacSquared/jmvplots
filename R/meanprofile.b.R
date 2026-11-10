@@ -64,9 +64,15 @@ meanprofileClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     }
                 }
                 state <- do.call(rbind, rows)
-                if (!is.null(state)) {
-                    state$group <- factor(state$group, levels = levels(df$group))
+                if (is.null(state)) {
+                    # no complete rows: an empty state lets the plot function
+                    # explain why nothing is drawn
+                    state <- data.frame(
+                        group = character(0), varIndex = integer(0),
+                        mean = numeric(0), half = numeric(0)
+                    )
                 }
+                state$group <- factor(state$group, levels = levels(df$group))
 
                 image$setState(state)
             },

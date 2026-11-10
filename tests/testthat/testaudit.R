@@ -80,3 +80,45 @@ testthat::test_that("discbar: a code-like range is refused with a message", {
         "zbyt szeroki zakres"
     )
 })
+
+testthat::test_that("plots explain an empty variable instead of failing obscurely", {
+    e <- data.frame(k = factor(rep(NA, 5), levels = c("a", "b")), n = rep(NA_real_, 5),
+                    a = c(1, 2, NA, NA, NA), b = c(NA, NA, 3, 4, 5))
+    testthat::expect_error(
+        auditGgplot(scatr::stackbar(data = e, x = "k"), ".stackbarPlot"),
+        "Brak obserwacji"
+    )
+    testthat::expect_error(
+        auditGgplot(scatr::pareto(data = e, x = "k"), ".pareto"),
+        "Brak obserwacji dla wykresu Pareto"
+    )
+    full <- data.frame(k = factor(c("a", "b", "a")), n = rep(NA_real_, 3))
+    testthat::expect_error(
+        auditGgplot(scatr::pareto(data = full, x = "k", counts = "n"), ".pareto"),
+        "Brak obserwacji dla wykresu Pareto"
+    )
+    # no row is complete in both variables
+    testthat::expect_error(
+        auditGgplot(scatr::meanprofile(data = e, vars = c("a", "b")), ".meanprofilePlot"),
+        "Profil średnich wymaga kompletnych obserwacji"
+    )
+})
+
+testthat::test_that("dumbbell keeps categories apart when their labels wrap to the same text", {
+    long <- "aaaa bbbb cccc dddd eeee ffff gggg hhhh iiii jjjj kkkk llll"
+    d <- data.frame(lab = c(paste(long, "1"), paste(long, "2")), s = c(1, 2), e = c(3, 5))
+    testthat::expect_true(anyDuplicated(jmvcore::wrapLabels(d$lab)) > 0)
+    p <- auditGgplot(scatr::dumbbell(data = d, label = "lab", start = "s", end = "e"), ".dumbbellPlot")
+    testthat::expect_equal(length(unique(ggplot2::ggplot_build(p)$data[[1]]$y)), 2)
+})
+
+testthat::test_that("stripmean names the error bars in the default caption", {
+    d <- data.frame(y = c(1, 2, 3, 4, 5, 6), g = rep(c("a", "b"), each = 3))
+    cap <- function(...) auditGgplot(scatr::stripmean(data = d, var = "y", group = "g", ...), ".stripPlot")$labels$caption
+    testthat::expect_match(cap(), "95% przedział ufności")
+    testthat::expect_match(cap(errorBars = "se"), "błąd standardowy")
+    testthat::expect_match(cap(errorBars = "sd"), "odchylenie standardowe")
+    testthat::expect_null(cap(errorBars = "none"))
+    testthat::expect_null(cap(showMean = FALSE))
+    testthat::expect_equal(cap(caption = "Własny podpis"), "Własny podpis")
+})

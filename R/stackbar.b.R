@@ -50,7 +50,8 @@ stackbarClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     dplyr::mutate(x = factor(x), segments = factor(segments))
 
                 if (is.null(self$options$segments) && self$options$barType == "percent") {
-                    df$x <- factor("")
+                    # rep(): a plain factor("") cannot be assigned to zero rows
+                    df$x <- factor(rep("", nrow(df)))
                 }
 
                 image$setState(df)

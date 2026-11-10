@@ -23,7 +23,12 @@ paretoClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                 data <- self$data
                 valuesCol <- factor(data[[x]])
 
-                if (!is.null(counts)) {
+                if (nlevels(valuesCol) == 0) {
+                    # no observed category: an empty table (the plot function
+                    # reports it); table()/xtabs() would lose the x column
+                    df <- data.frame(x = character(0), counts = numeric(0))
+                    labels <- list(x = x, y = if (is.null(counts)) .("Frequency (N)") else counts)
+                } else if (!is.null(counts)) {
                     countsCol <- jmvcore::toNumeric(data[[counts]])
                     df <- data.frame(x = valuesCol, counts = countsCol)
                     df <- as.data.frame(xtabs(counts ~ x, data = df))
@@ -49,6 +54,9 @@ paretoClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
 
                 df <- image$state$df
                 total <- sum(df$counts)
+                if (nrow(df) == 0 || !is.finite(total) || total <= 0) {
+                    stop("Brak obserwacji dla wykresu Pareto.", call. = FALSE)
+                }
 
                 plot_call_list <- private$.getPlotCallList(image$state, theme, total)
 

@@ -204,10 +204,25 @@ stripmeanClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
             #### Helper functions ----
             .getDefaultLabels = function() {
                 wide <- self$options$mode == "wide"
+                # say what the error bars show (a caption typed by the user
+                # replaces this default)
+                caption <- NULL
+                if (self$options$showMean) {
+                    caption <- switch(self$options$errorBars,
+                        ci = sprintf(
+                            "Kreska: średnia; słupki błędu: %g%% przedział ufności",
+                            self$options$ciWidth
+                        ),
+                        se = "Kreska: średnia; słupki błędu: błąd standardowy",
+                        sd = "Kreska: średnia; słupki błędu: odchylenie standardowe",
+                        NULL
+                    )
+                }
                 return(list(
                     xLabel = if (wide) "" else self$options$group,
                     yLabel = if (wide) .("Value") else self$options$var,
-                    groupLabel = NULL
+                    groupLabel = NULL,
+                    caption = caption
                 ))
             }
         ),

@@ -54,7 +54,12 @@ dumbbellClass <- if (requireNamespace("jmvcore", quietly = TRUE)) {
                     rev(seq_len(nrow(df)))
                 )
                 df$label <- factor(df$label, levels = df$label[ord])
-                levels(df$label) <- jmvcore::wrapLabels(levels(df$label))
+                # two categories may wrap to the same text; merging them would
+                # stack two dumbbells on one row
+                wrapped <- jmvcore::wrapLabels(levels(df$label))
+                if (!anyDuplicated(wrapped)) {
+                    levels(df$label) <- wrapped
+                }
 
                 startName <- self$options$start
                 endName <- self$options$end
